@@ -1,0 +1,40 @@
+============================================================
+  GRAPHSHIELD — HOW TO RUN
+============================================================
+
+STEP 1 — Project folder mein jao
+----------------------------------
+  Command Prompt ya PowerShell kholo aur type karo:
+
+  cd "C:\Users\anmol\OneDrive\Desktop\GraphShield Explainable Graph Neural Network for Financial Fraud Detection"
+
+
+STEP 2 — Server start karo
+----------------------------------
+  python -m uvicorn api.app:app --host 0.0.0.0 --port 8000
+
+  Agar yeh dikhe:
+    INFO:     Application startup complete.
+  Matlab server chal raha hai. ✓
+
+
+STEP 3 — Dashboard kholo
+----------------------------------
+  Browser mein jao aur type karo:
+
+  http://localhost:8000
+
+  Ya seedha yeh run karo PowerShell mein:
+  Start-Process "http://localhost:8000"
+
+
+STEP 4 — Koi node score karo
+----------------------------------
+  Dashboard pe Node ID daalo, jaise:
+    27695   (fraud hub)
+    31473   (illicit)
+    100     (licit / clean)
+
+  Score button dabao — graph aa jayega.
+
+

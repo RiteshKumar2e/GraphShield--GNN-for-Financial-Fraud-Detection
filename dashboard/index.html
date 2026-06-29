@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GraphShield — Financial Fraud Detection</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+/* ── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #f5f7fa;
+  --surface:   #ffffff;
+  --surface2:  #f0f3f7;
+  --border:    #dce1e9;
+  --border2:   #c8cfd9;
+  --text:      #111827;
+  --text2:     #374151;
+  --muted:     #6b7280;
+  --blue:      #1d4ed8;
+  --blue-lt:   #eff6ff;
+  --blue-mid:  #3b82f6;
+  --red:       #dc2626;
+  --red-lt:    #fef2f2;
+  --red-mid:   #ef4444;
+  --green:     #16a34a;
+  --green-lt:  #f0fdf4;
+  --green-mid: #22c55e;
+  --amber:     #d97706;
+  --amber-lt:  #fffbeb;
+  --purple:    #7c3aed;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow:    0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.10), 0 4px 8px rgba(0,0,0,.06);
+  --radius:    10px;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'Segoe UI', 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+}
+.logo {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.logo em { color: var(--blue); font-style: normal; }
+.status-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1.5px solid;
+  letter-spacing: .3px;
+}
+.status-pill.online  { color: var(--green); border-color: var(--green); background: var(--green-lt); }
+.status-pill.offline { color: var(--red);   border-color: var(--red);   background: var(--red-lt); }
+.header-desc {
+  font-size: 12px;
+  color: var(--muted);
+  border-left: 1px solid var(--border);
+  padding-left: 14px;
+  margin-left: 4px;
+}
+header nav { margin-left: auto; display: flex; gap: 4px; }
+header nav a {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background .15s, color .15s;
+}
+header nav a:hover { background: var(--surface2); color: var(--text); }
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.workspace {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.sidebar-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-section:last-child { border-bottom: none; }
+.sec-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* Search */
+.search-row { display: flex; gap: 8px; }
+.search-row input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface2);
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+.search-row input:focus { border-color: var(--blue-mid); background: #fff; }
+.search-row input::placeholder { color: var(--muted); }
+.btn-score {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.btn-score:hover { background: #1e40af; }
+.search-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+.search-hint a { color: var(--blue); cursor: pointer; text-decoration: none; font-weight: 500; }
+.search-hint a:hover { text-decoration: underline; }
+.err { color: var(--red); font-size: 12px; min-height: 16px; margin-top: 4px; }
+.spinner-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; height: 18px; }
+.spinner { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--blue); border-radius:50%; animation:spin .6s linear infinite; display:none; }
+.spinner.on { display:block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Result card */
+.result-card {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: none;
+}
+.result-card.show { display: block; }
+.result-header {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.result-node-id { font-size: 13px; font-weight: 700; color: var(--text); }
+.verdict {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  letter-spacing: .3px;
+}
+.verdict.ILLICIT { background: var(--red-lt);   color: var(--red);   border: 1px solid #fca5a5; }
+.verdict.LICIT   { background: var(--green-lt); color: var(--green); border: 1px solid #86efac; }
+.verdict.REVIEW  { background: var(--amber-lt); color: var(--amber); border: 1px solid #fcd34d; }
+.result-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.prob-big { font-size: 28px; font-weight: 800; line-height: 1; }
+.prob-big.high { color: var(--red); }
+.prob-big.med  { color: var(--amber); }
+.prob-big.low  { color: var(--green); }
+.prob-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.prob-track {
+  height: 8px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.prob-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+.prob-fill.high { background: linear-gradient(90deg, #f97316, #dc2626); }
+.prob-fill.med  { background: linear-gradient(90deg, #fbbf24, #f97316); }
+.prob-fill.low  { background: linear-gradient(90deg, #4ade80, #16a34a); }
+.conf-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+
+/* Features */
+.feat-item { display: flex; align-items: center; gap: 8px; }
+.feat-name { font-size: 11px; color: var(--text2); width: 72px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: monospace; }
+.feat-track { flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.feat-fill { height: 100%; background: linear-gradient(90deg, var(--blue-mid), var(--purple)); border-radius: 99px; }
+.feat-val { font-size: 10px; color: var(--muted); width: 36px; text-align: right; font-family: monospace; }
+
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat-tile {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.stat-tile .val { font-size: 18px; font-weight: 800; color: var(--text); }
+.stat-tile .val.red   { color: var(--red); }
+.stat-tile .val.green { color: var(--green); }
+.stat-tile .val.blue  { color: var(--blue); }
+.stat-tile .lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* Feed */
+.feed { display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; }
+.feed-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .12s;
+}
+.feed-row:hover { background: var(--surface2); }
+.feed-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.feed-txt { flex: 1; font-size: 12px; color: var(--text2); font-weight: 500; }
+.feed-pct { font-size: 12px; font-weight: 700; }
+
+/* ── Main panel ──────────────────────────────────────────────── */
+.main { display: flex; flex-direction: column; overflow: hidden; }
+
+/* Info banner above graph */
+.graph-info-bar {
+  background: var(--blue-lt);
+  border-bottom: 1.5px solid #bfdbfe;
+  padding: 10px 20px;
+  display: none;
+  align-items: flex-start;
+  gap: 12px;
+}
+.graph-info-bar.show { display: flex; }
+.info-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.info-content { flex: 1; }
+.info-title { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 2px; }
+.info-body { font-size: 12px; color: #1e40af; line-height: 1.5; }
+
+/* Tabs */
+.tabs {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--border);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.tab {
+  padding: 13px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1.5px;
+  transition: color .15s;
+  user-select: none;
+}
+.tab.active { color: var(--blue); border-color: var(--blue); font-weight: 600; }
+.tab:hover:not(.active) { color: var(--text); }
+
+/* Graph area */
+.graph-wrap { flex: 1; position: relative; overflow: hidden; background: #eef2f8; }
+#graph-svg {
+  width: 100%; height: 100%;
+  background: radial-gradient(ellipse at 50% 40%, #e8eef8 0%, #dde5f2 100%);
+}
+
+/* Graph annotation boxes (appear on canvas) */
+.graph-annotations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Legend */
+.legend-card {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  display: none;
+  min-width: 220px;
+}
+.legend-card.show { display: block; }
+.legend-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 10px; }
+.legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.legend-item:last-child { margin-bottom: 0; }
+.legend-circle {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: #fff;
+}
+.legend-text { font-size: 12px; color: var(--text2); line-height: 1.3; }
+.legend-text strong { display: block; font-weight: 600; color: var(--text); font-size: 12px; }
+.legend-text span { font-size: 11px; color: var(--muted); }
+.legend-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+.legend-hint { font-size: 10px; color: var(--muted); line-height: 1.4; }
+
+/* Zoom controls */
+.zoom-controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.z-btn {
+  width: 32px; height: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 16px;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: background .12s;
+}
+.z-btn:hover { background: var(--surface2); }
+
+/* Graph count badge */
+.graph-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  box-shadow: var(--shadow-sm);
+  display: none;
+}
+.graph-badge.show { display: flex; gap: 10px; align-items: center; }
+.badge-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* Tooltip */
+.tip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 13px;
+  font-size: 12px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transition: opacity .12s;
+  z-index: 100;
+  min-width: 150px;
+}
+.tip-title { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 5px; }
+.tip-row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); margin-top: 2px; }
+.tip-row span:last-child { font-weight: 600; color: var(--text); }
+.tip-hint { font-size: 10px; color: var(--blue); margin-top: 6px; border-top: 1px solid var(--border); padding-top: 5px; }
+
+/* Empty state */
+.empty {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; color: var(--muted);
+  text-align: center; padding: 40px;
+}
+.empty-icon { font-size: 52px; opacity: .25; }
+.empty h3 { font-size: 16px; font-weight: 600; color: var(--text2); }
+.empty p { font-size: 13px; max-width: 340px; line-height: 1.6; }
+.empty.hidden { display: none; }
+
+/* Explanation tab */
+.exp-panel {
+  flex: 1; overflow-y: auto; padding: 24px;
+  display: none; background: var(--bg);
+}
+.exp-panel.show { display: block; }
+.exp-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+.exp-section h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.exp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.exp-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.exp-table tr:last-child td { border-bottom: none; }
+.exp-table td:first-child { color: var(--muted); width: 140px; }
+.exp-table td:last-child { font-weight: 600; color: var(--text); }
+.what-box { background: var(--blue-lt); border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #1e40af; line-height: 1.6; }
+
+scrollbar-width: thin;
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<header>
+  <div class="logo">Graph<em>Shield</em></div>
+  <span class="status-pill offline" id="status-pill">● Connecting…</span>
+  <span class="header-desc">Explainable GNN · Elliptic Bitcoin Dataset · 46,564 Transactions</span>
+  <nav>
+    <a href="/api/docs" target="_blank">API Docs</a>
+    <a href="/api/v1/health" target="_blank">Health</a>
+    <a href="/api/v1/stats" target="_blank">Stats</a>
+  </nav>
+</header>
+
+<div class="workspace">
+
+  <!-- ════ SIDEBAR ════ -->
+  <aside class="sidebar">
+
+    <!-- Score a node -->
+    <div class="sidebar-section">
+      <div class="sec-label">Inspect Transaction Node</div>
+      <div class="search-row">
+        <input type="number" id="node-input" placeholder="Enter Node ID  (e.g. 27695)" min="0"/>
+        <button class="btn-score" onclick="scoreNode()">Score</button>
+      </div>
+      <div class="search-hint">
+        Try:
+        <a onclick="quickScore(27695)">27695</a> (fraud hub · 30 edges) ·
+        <a onclick="quickScore(31473)">31473</a> (illicit) ·
+        <a onclick="quickScore(100)">100</a> (licit)
+      </div>
+      <div class="err" id="err"></div>
+      <div class="spinner-row">
+        <div class="spinner" id="spinner"></div>
+        <span style="font-size:12px;color:var(--muted)" id="spin-txt"></span>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="sidebar-section">
+      <div class="sec-label">Fraud Score</div>
+      <div class="result-card" id="result-card">
+        <div class="result-header">
+          <span class="result-node-id" id="rc-id">Node #–</span>
+          <span class="verdict" id="rc-verdict">–</span>
+        </div>
+        <div class="result-body">
+          <div>
+            <div class="prob-big" id="rc-prob">–</div>
+            <div class="prob-label">Fraud Probability</div>
+          </div>
+          <div>
+            <div class="prob-track"><div class="prob-fill" id="rc-bar" style="width:0%"></div></div>
+            <div class="conf-row" style="margin-top:5px">
+              <span id="rc-conf">–</span>
+              <span id="rc-model" style="font-family:monospace">–</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top features -->
+    <div class="sidebar-section" id="feat-section" style="display:none">
+      <div class="sec-label">Top Predictive Features</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">
+        Features ranked by influence on this node's fraud score
+      </div>
+      <div id="feat-list" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+
+    <!-- Dataset stats -->
+    <div class="sidebar-section">
+      <div class="sec-label">Dataset Overview</div>
+      <div class="stats-grid">
+        <div class="stat-tile"><div class="val blue" id="st-nodes">–</div><div class="lbl">Total Transactions</div></div>
+        <div class="stat-tile"><div class="val" id="st-edges">–</div><div class="lbl">Graph Edges</div></div>
+        <div class="stat-tile"><div class="val red" id="st-illicit">–</div><div class="lbl">Illicit (Fraud)</div></div>
+        <div class="stat-tile"><div class="val" id="st-rate">–</div><div class="lbl">Fraud Rate</div></div>
+        <div class="stat-tile"><div class="val" id="st-model">–</div><div class="lbl">Active Model</div></div>
+        <div class="stat-tile"><div class="val green" id="st-preds">0</div><div class="lbl">Queries Served</div></div>
+      </div>
+    </div>
+
+    <!-- Recent queries -->
+    <div class="sidebar-section">
+      <div class="sec-label">Recent Queries</div>
+      <div class="feed" id="feed">
+        <div style="font-size:12px;color:var(--muted)">No queries yet — score a node above</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ════ MAIN ════ -->
+  <div class="main">
+
+    <!-- Info banner -->
+    <div class="graph-info-bar" id="info-bar">
+      <div class="info-icon">🔍</div>
+      <div class="info-content">
+        <div class="info-title" id="info-title">Transaction Subgraph Analysis</div>
+        <div class="info-body" id="info-body">Select a node to see its network context.</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" id="tab-graph" onclick="switchTab('graph')">Transaction Subgraph</div>
+      <div class="tab" id="tab-exp"   onclick="switchTab('exp')">Full Explanation</div>
+    </div>
+
+    <!-- Graph panel -->
+    <div class="graph-wrap" id="panel-graph">
+      <svg id="graph-svg"></svg>
+
+      <!-- Empty state -->
+      <div class="empty" id="empty">
+        <div class="empty-icon">⬡</div>
+        <h3>Transaction Network Explorer</h3>
+        <p>Enter any transaction node ID on the left and press <strong>Score</strong>.<br/>
+        The graph will show that transaction's 2-hop network — who it sent money to and received from — with fraud nodes highlighted in red.</p>
+        <p style="margin-top:8px;font-size:12px">
+          Try node <strong style="color:var(--blue);cursor:pointer" onclick="quickScore(27695)">27695</strong>
+          — a known fraud ring hub with 30 connections.
+        </p>
+      </div>
+
+      <!-- Node count badge -->
+      <div class="graph-badge" id="graph-badge">
+        <span class="badge-dot" style="background:var(--red)"></span><span id="badge-illicit">0 Illicit</span>
+        <span class="badge-dot" style="background:var(--green)"></span><span id="badge-licit">0 Licit</span>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-card" id="legend">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="legend-title" style="margin-bottom:0">What this graph shows</div>
+          <button onclick="toggleLegend()" id="legend-toggle"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;
+                   padding:2px 8px;font-size:11px;cursor:pointer;color:var(--muted);font-weight:600">
+            Hide
+          </button>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-circle" style="background:var(--blue);box-shadow:0 0 0 3px #bfdbfe">T</div>
+          <div class="legend-text">
+            <strong>Target Node (Inspected)</strong>
+            <span>The transaction you searched for. Its fraud probability is shown as a coloured ring.</span>
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-circle" style="background:var(--red)">!</div>
+          <div class="legend-text">
+            <strong>Illicit Transaction</strong>
+            <span>Known fraudulent node. Red edges = money flows to/from illicit nodes.</span>
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-circle" style="background:var(--green)">✓</div>
+          <div class="legend-text">
+            <strong>Licit Transaction</strong>
+            <span>Verified clean transaction. Grey edges = normal money flows.</span>
+          </div>
+        </div>
+
+        <hr class="legend-divider"/>
+
+        <div class="legend-item" style="margin-bottom:4px">
+          <svg width="36" height="14" style="flex-shrink:0">
+            <circle cx="7" cy="7" r="6" fill="none" stroke="var(--red)" stroke-width="2"
+              stroke-dasharray="26 13" transform="rotate(-90 7 7)"/>
+            <circle cx="29" cy="7" r="6" fill="none" stroke="var(--blue)" stroke-width="2"
+              stroke-dasharray="39 0" transform="rotate(-90 29 7)"/>
+          </svg>
+          <div class="legend-text">
+            <strong>Probability Arc</strong>
+            <span>The outer ring shows fraud probability. Full ring = 100% fraud.</span>
+          </div>
+        </div>
+
+        <hr class="legend-divider"/>
+        <div class="legend-hint">
+          <strong>Drag</strong> nodes to rearrange · <strong>Scroll</strong> to zoom ·
+          <strong>Click</strong> any node to inspect it
+        </div>
+      </div>
+
+      <div class="zoom-controls">
+        <button class="z-btn" onclick="zoomIn()" title="Zoom in">+</button>
+        <button class="z-btn" onclick="zoomOut()" title="Zoom out">−</button>
+        <button class="z-btn" onclick="resetZoom()" title="Reset view" style="font-size:13px">⌂</button>
+      </div>
+
+      <div class="tip" id="tip"></div>
+    </div>
+
+    <!-- Explanation panel -->
+    <div class="exp-panel" id="panel-exp">
+      <div id="exp-content" style="color:var(--muted);font-size:13px">Run a prediction first.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = '/api/v1';
+let svg, zoom, sim;
+let feed = [];
+
+// ── Boot ──────────────────────────────────────────────────────
+async function boot() {
+  initSvg();
+  await fetchStats();
+  setInterval(fetchStats, 15000);
+  document.getElementById('node-input').addEventListener('keydown', e => { if(e.key==='Enter') scoreNode(); });
+}
+
+// ── Stats ────────────────────────────────────────────────────
+async function fetchStats() {
+  try {
+    const [h, s] = await Promise.all([
+      fetch(`${API}/health`).then(r=>r.json()),
+      fetch(`${API}/stats`).then(r=>r.json()),
+    ]);
+    const p = document.getElementById('status-pill');
+    p.textContent = h.status==='ok' ? '● Online' : '● Loading…';
+    p.className = 'status-pill ' + (h.status==='ok' ? 'online' : 'offline');
+    set('st-nodes',   fmt(s.total_nodes));
+    set('st-edges',   fmt(s.total_edges));
+    set('st-illicit', fmt(s.illicit_nodes));
+    set('st-rate',    s.fraud_rate + '%');
+    set('st-model',   s.model_name);
+    set('st-preds',   s.predictions_served);
+  } catch { document.getElementById('status-pill').className='status-pill offline'; }
+}
+
+// ── Score ─────────────────────────────────────────────────────
+async function scoreNode() {
+  const v = document.getElementById('node-input').value.trim();
+  if(!v) return;
+  const id = parseInt(v);
+  if(isNaN(id)||id<0){ showErr('Enter a valid node ID'); return; }
+  loading(true); clearErr();
+  try {
+    const [sc, ex] = await Promise.all([
+      fetch(`${API}/score/`,   {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({node_id:id})}).then(r=>{if(!r.ok)throw new Error('Node not found or server error');return r.json();}),
+      fetch(`${API}/explain/`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({node_id:id,top_k_edges:25})}).then(r=>r.json()),
+    ]);
+    renderCard(sc);
+    renderFeatures(sc.top_features);
+    renderGraph(id, ex, sc);
+    renderExplanation(sc, ex);
+    renderInfoBar(sc, ex);
+    pushFeed(id, sc);
+    await fetchStats();
+  } catch(e){ showErr(e.message||'Connection error'); } finally { loading(false); }
+}
+function quickScore(id) { document.getElementById('node-input').value=id; scoreNode(); }
+
+// ── Score card ────────────────────────────────────────────────
+function renderCard(sc) {
+  const fp  = sc.fraud_probability;
+  const pct = (fp*100).toFixed(2)+'%';
+  const cls = fp>=.7?'high':fp>=.35?'med':'low';
+  document.getElementById('result-card').className = 'result-card show';
+  set('rc-id',      'Node #'+sc.node_id);
+  set('rc-prob',    pct);
+  set('rc-conf',    sc.confidence+' confidence');
+  set('rc-model',   document.getElementById('st-model').textContent);
+  document.getElementById('rc-prob').className    = 'prob-big '+cls;
+  document.getElementById('rc-bar').className     = 'prob-fill '+cls;
+  document.getElementById('rc-bar').style.width   = (fp*100)+'%';
+  const v = document.getElementById('rc-verdict');
+  v.textContent = sc.verdict;
+  v.className   = 'verdict '+sc.verdict;
+}
+
+// ── Features ──────────────────────────────────────────────────
+function renderFeatures(feats) {
+  if(!feats||!feats.length) return;
+  document.getElementById('feat-section').style.display='block';
+  const max = feats[0].importance||1;
+  document.getElementById('feat-list').innerHTML = feats.map(f=>`
+    <div class="feat-item">
+      <span class="feat-name" title="${f.name}">${f.name}</span>
+      <div class="feat-track"><div class="feat-fill" style="width:${(f.importance/max*100).toFixed(0)}%"></div></div>
+      <span class="feat-val">${f.importance.toFixed(3)}</span>
+    </div>`).join('');
+}
+
+// ── Info bar ──────────────────────────────────────────────────
+function renderInfoBar(sc, ex) {
+  const bar   = document.getElementById('info-bar');
+  const nn    = (ex.explanation_nodes||[]).length;
+  const ne    = (ex.explanation_edges||[]).length;
+  const ill   = (ex.explanation_nodes||[]).filter(n=>n.label===1&&!n.is_target).length;
+  const fp    = (sc.fraud_probability*100).toFixed(1);
+  bar.className = 'graph-info-bar show';
+  set('info-title', `Node #${sc.node_id} — ${sc.verdict} (${fp}% fraud probability)`);
+  set('info-body',
+    `Showing the 2-hop transaction subgraph: ${nn} connected transactions and ${ne} money flows. ` +
+    (ill>0
+      ? `⚠ ${ill} illicit neighbour${ill>1?'s':''} detected — this node is embedded in a fraud ring.`
+      : `✓ No illicit direct neighbours found — fraud signal comes from the node's own features.`)
+  );
+}
+
+// ── D3 graph ──────────────────────────────────────────────────
+function nR(d) { return d.is_target?40:d.label===1?28:22; }
+function nC(d) {
+  if(d.is_target) return '#1d4ed8';
+  if(d.label===1)  return '#dc2626';
+  return '#16a34a';
+}
+
+function initSvg() {
+  svg  = d3.select('#graph-svg');
+  zoom = d3.zoom().scaleExtent([.1,6]).on('zoom', e => svg.select('g.root').attr('transform', e.transform));
+  svg.call(zoom);
+  svg.append('g').attr('class','root');
+}
+
+function renderGraph(targetId, ex, sc) {
+  document.getElementById('empty').classList.add('hidden');
+  document.getElementById('legend').classList.add('show');
+  document.getElementById('graph-badge').classList.add('show');
+
+  const nodes = ex.explanation_nodes||[];
+  const edges = ex.explanation_edges||[];
+
+  const nIll  = nodes.filter(n=>n.label===1&&!n.is_target).length;
+  const nLic  = nodes.filter(n=>n.label===0).length;
+  set('badge-illicit', nIll+' Illicit');
+  set('badge-licit',   nLic+' Licit');
+
+  if(!nodes.length) return;
+
+  const el = document.getElementById('graph-svg');
+  const W  = el.clientWidth||900, H = el.clientHeight||600;
+  const root = svg.select('g.root');
+  root.selectAll('*').remove();
+  svg.select('defs').remove();
+
+  // ── Defs ──
+  const defs = svg.append('defs');
+  const mkArrow = (id, color) => defs.append('marker')
+    .attr('id',id).attr('viewBox','0 -5 10 10')
+    .attr('refX',32).attr('refY',0)
+    .attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
+    .append('path').attr('d','M0,-5L10,0L0,5').attr('fill',color);
+  mkArrow('arr',     '#9eaab8');
+  mkArrow('arr-red', '#dc2626');
+  mkArrow('arr-blue','#1d4ed8');
+
+  const mkGlow = (id, color) => {
+    const f = defs.append('filter').attr('id',id)
+      .attr('x','-60%').attr('y','-60%').attr('width','220%').attr('height','220%');
+    f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation',6).attr('result','b');
+    const m = f.append('feMerge');
+    m.append('feMergeNode').attr('in','b');
+    m.append('feMergeNode').attr('in','SourceGraphic');
+  };
+  mkGlow('gl-blue','#1d4ed8');
+  mkGlow('gl-red','#dc2626');
+  mkGlow('gl-green','#16a34a');
+
+  // ── Sim data ──
+  const sim_nodes = nodes.map(n=>({...n}));
+  const idxMap = {}; sim_nodes.forEach((n,i)=>{ idxMap[n.id]=i; });
+  const sim_links = edges
+    .map(e=>({source:idxMap[e.source],target:idxMap[e.target],weight:e.weight}))
+    .filter(l=>l.source!==undefined&&l.target!==undefined);
+
+  if(sim) sim.stop();
+  sim = d3.forceSimulation(sim_nodes)
+    .force('link',      d3.forceLink(sim_links).id((_,i)=>i).distance(120).strength(.5))
+    .force('charge',    d3.forceManyBody().strength(-700))
+    .force('center',    d3.forceCenter(W/2, H/2))
+    .force('collision', d3.forceCollide(d=>nR(d)+18))
+    .alphaDecay(.02);
+
+  // ── Edges ──
+  const linkG = root.append('g');
+  const link  = linkG.selectAll('line').data(sim_links).join('line')
+    .attr('stroke', d => {
+      const s = sim_nodes[typeof d.source==='object'?d.source.index:d.source];
+      const t = sim_nodes[typeof d.target==='object'?d.target.index:d.target];
+      if(s&&s.is_target||t&&t.is_target) return '#1d4ed8';
+      if((s&&s.label===1)||(t&&t.label===1)) return '#dc2626';
+      return '#9eaab8';
+    })
+    .attr('stroke-width', d => 1.5 + d.weight*2.5)
+    .attr('stroke-opacity', .7)
+    .attr('marker-end', d => {
+      const s = sim_nodes[typeof d.source==='object'?d.source.index:d.source];
+      const t = sim_nodes[typeof d.target==='object'?d.target.index:d.target];
+      if(s&&s.is_target||t&&t.is_target) return 'url(#arr-blue)';
+      if((s&&s.label===1)||(t&&t.label===1)) return 'url(#arr-red)';
+      return 'url(#arr)';
+    });
+
+  // ── Nodes ──
+  const nodeG = root.append('g');
+  const nodeEl = nodeG.selectAll('g').data(sim_nodes).join('g')
+    .style('cursor','pointer')
+    .call(d3.drag()
+      .on('start',(e,d)=>{ if(!e.active)sim.alphaTarget(.3).restart(); d.fx=d.x;d.fy=d.y; })
+      .on('drag', (e,d)=>{ d.fx=e.x;d.fy=e.y; })
+      .on('end',  (e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null;d.fy=null; }))
+    .on('mouseover', showTip)
+    .on('mousemove', moveTip)
+    .on('mouseout',  hideTip)
+    .on('click', (_,d)=>{ quickScore(d.id); });
+
+  // soft glow halo
+  nodeEl.append('circle')
+    .attr('r', d=>nR(d)+12)
+    .attr('fill', nC)
+    .attr('fill-opacity', .12)
+    .attr('stroke','none');
+
+  // main filled circle
+  nodeEl.append('circle')
+    .attr('r', nR)
+    .attr('fill', nC)
+    .attr('stroke', d=>d.is_target?'#ffffff':d.label===1?'#fca5a5':'#86efac')
+    .attr('stroke-width', d=>d.is_target?4:2)
+    .attr('filter', d=>d.is_target?'url(#gl-blue)':d.label===1?'url(#gl-red)':'url(#gl-green)');
+
+  // fraud probability arc ring
+  nodeEl.filter(d=>d.label===1||d.is_target).append('circle')
+    .attr('r', d=>nR(d)+6)
+    .attr('fill','none')
+    .attr('stroke', d=>d.is_target?'#3b82f6':'#ef4444')
+    .attr('stroke-width', 3)
+    .attr('stroke-dasharray', d=>{ const c=2*Math.PI*(nR(d)+6); return `${c*d.fraud_prob} ${c*(1-d.fraud_prob)}`; })
+    .attr('stroke-linecap','round')
+    .attr('transform','rotate(-90)');
+
+  // type label (TOP line inside circle)
+  nodeEl.append('text')
+    .attr('text-anchor','middle').attr('y',-7)
+    .attr('font-family',"'Segoe UI',Arial,sans-serif")
+    .attr('font-size', d=>d.is_target?9:7)
+    .attr('font-weight','700').attr('letter-spacing','.5')
+    .attr('fill','rgba(255,255,255,.8)').attr('pointer-events','none')
+    .text(d=>d.is_target?'TARGET':d.label===1?'ILLICIT':'LICIT');
+
+  // node ID (BOTTOM line inside circle — big bold)
+  nodeEl.append('text')
+    .attr('text-anchor','middle').attr('y',7)
+    .attr('font-family',"'Segoe UI',Arial,sans-serif")
+    .attr('font-size', d=>d.is_target?15:12)
+    .attr('font-weight','800')
+    .attr('fill','#ffffff').attr('pointer-events','none')
+    .text(d=>d.id);
+
+  // fraud % below circle
+  nodeEl.filter(d=>d.label===1||d.is_target).append('text')
+    .attr('text-anchor','middle')
+    .attr('dy', d=>nR(d)+22)
+    .attr('font-size',10).attr('font-weight','700')
+    .attr('fill', d=>d.is_target?'#1d4ed8':'#dc2626')
+    .attr('pointer-events','none')
+    .text(d=>(d.fraud_prob*100).toFixed(0)+'%');
+
+  // ── Tick ──
+  sim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
+        .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    nodeEl.attr('transform',d=>`translate(${d.x},${d.y})`);
+  });
+
+  // zoom to fit
+  setTimeout(()=>{
+    const b = root.node().getBBox();
+    if(b.width>10){
+      const pad=70, sc2=Math.min((W-pad*2)/b.width,(H-pad*2)/b.height,1.2);
+      const tx=W/2-sc2*(b.x+b.width/2), ty=H/2-sc2*(b.y+b.height/2);
+      svg.transition().duration(700).ease(d3.easeCubicOut)
+        .call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(sc2));
+    }
+  },1400);
+}
+
+// ── Tooltip ───────────────────────────────────────────────────
+const tip = document.getElementById('tip');
+function showTip(e,d) {
+  const fp=(d.fraud_prob*100).toFixed(2);
+  const type=d.is_target?'🔵 TARGET':d.label===1?'🔴 ILLICIT':'🟢 LICIT';
+  tip.innerHTML=`
+    <div class="tip-title">Node #${d.id}</div>
+    <div class="tip-row"><span>Type</span><span>${type}</span></div>
+    <div class="tip-row"><span>Fraud Prob</span><span>${fp}%</span></div>
+    <div class="tip-hint">Click to inspect this node →</div>`;
+  tip.style.opacity=1;
+}
+function moveTip(e) {
+  const wrap = document.getElementById('panel-graph').getBoundingClientRect();
+  tip.style.left=(e.clientX-wrap.left+14)+'px';
+  tip.style.top =(e.clientY-wrap.top-10)+'px';
+}
+function hideTip() { tip.style.opacity=0; }
+
+// ── Full Explanation tab ──────────────────────────────────────
+function renderExplanation(sc, ex) {
+  const ill   = (ex.explanation_nodes||[]).filter(n=>n.label===1&&!n.is_target).length;
+  const total = (ex.explanation_nodes||[]).length;
+  const edges = (ex.explanation_edges||[]).length;
+  const fp    = (sc.fraud_probability*100).toFixed(4);
+  document.getElementById('exp-content').innerHTML = `
+
+    <div class="exp-section">
+      <h3>📌 What is this graph showing?</h3>
+      <div class="what-box">
+        This is the <strong>2-hop transaction subgraph</strong> of Node #${sc.node_id} in the Bitcoin blockchain.
+        Each <strong>circle (node)</strong> represents one Bitcoin transaction. Each <strong>arrow (edge)</strong>
+        shows the flow of Bitcoin — from the source transaction to the destination.
+        The graph model (${document.getElementById('st-model').textContent}) analysed how this transaction
+        is connected to its neighbours to decide if it is part of a fraud ring.
+      </div>
+    </div>
+
+    <div class="exp-section">
+      <h3>🎯 Prediction Result</h3>
+      <table class="exp-table">
+        <tr><td>Node ID</td><td>#${sc.node_id}</td></tr>
+        <tr><td>Verdict</td><td><span class="verdict ${sc.verdict}">${sc.verdict}</span></td></tr>
+        <tr><td>Fraud Probability</td><td style="color:${sc.verdict==='ILLICIT'?'var(--red)':'var(--green)'}">${fp}%</td></tr>
+        <tr><td>Confidence</td><td>${sc.confidence}</td></tr>
+        <tr><td>Model Used</td><td>${document.getElementById('st-model').textContent} (Graph Neural Network)</td></tr>
+        <tr><td>Subgraph Size</td><td>${total} nodes · ${edges} edges</td></tr>
+        <tr><td>Illicit Neighbours</td><td style="color:${ill>0?'var(--red)':'var(--green)'}">
+          ${ill>0?'⚠ '+ill+' fraud node'+(ill>1?'s':'')+' directly connected':'✓ None found'}
+        </td></tr>
+      </table>
+    </div>
+
+    <div class="exp-section">
+      <h3>🕸️ How to read the graph</h3>
+      <table class="exp-table">
+        <tr><td>🔵 Blue circle (large)</td><td>The transaction you searched for — the target node</td></tr>
+        <tr><td>🔴 Red circle</td><td>An ILLICIT (fraudulent) transaction in the network</td></tr>
+        <tr><td>🟢 Green circle</td><td>A LICIT (clean) transaction in the network</td></tr>
+        <tr><td>🔴 Red arrows</td><td>Bitcoin flowing to or from a fraud node</td></tr>
+        <tr><td>⚫ Grey arrows</td><td>Normal Bitcoin flows between clean transactions</td></tr>
+        <tr><td>Outer arc ring</td><td>Length = fraud probability (full circle = 100% fraud)</td></tr>
+        <tr><td>% below node</td><td>The model's fraud probability for that node</td></tr>
+        <tr><td>Click any node</td><td>Instantly inspect that transaction</td></tr>
+      </table>
+    </div>
+
+    <div class="exp-section">
+      <h3>🧠 Why was this verdict reached?</h3>
+      <div class="what-box">
+        ${ex.summary || `Node #${sc.node_id} received a fraud score of ${fp}% based on its
+        own transaction features and the fraud signals propagated from its neighbours.
+        The Graph Neural Network aggregates information from connected transactions across 2 hops
+        (neighbours of neighbours), so even indirectly connected fraud nodes contribute to the score.`}
+      </div>
+    </div>
+
+    <div class="exp-section">
+      <h3>📊 Top Features Driving the Score</h3>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">
+        Features with prefix <code>nbr_</code> are neighbourhood-aggregated statistics (graph structure).
+        Features with prefix <code>local_</code> are transaction-level statistics (amount, inputs, outputs).
+      </div>
+      <table class="exp-table">
+        <tr style="font-size:11px;color:var(--muted)">
+          <td>Rank</td><td>Feature Name</td><td>Importance</td><td>Type</td>
+        </tr>
+        ${(ex.top_features||[]).map((f,i)=>`
+        <tr>
+          <td>#${i+1}</td>
+          <td style="font-family:monospace;font-size:12px">${f.name}</td>
+          <td>${f.importance.toFixed(4)}</td>
+          <td style="font-size:11px;color:var(--muted)">${f.name.startsWith('nbr')?'🕸 Graph neighbourhood':'📄 Transaction feature'}</td>
+        </tr>`).join('')}
+      </table>
+    </div>`;
+}
+
+// ── Feed ──────────────────────────────────────────────────────
+function pushFeed(id, sc) {
+  feed.unshift({id, sc});
+  if(feed.length>12) feed.pop();
+  document.getElementById('feed').innerHTML = feed.slice(0,8).map(({id,sc})=>{
+    const cl = sc.verdict==='ILLICIT'?'var(--red)':sc.verdict==='LICIT'?'var(--green)':'var(--amber)';
+    return `<div class="feed-row" onclick="quickScore(${id})">
+      <span class="feed-dot" style="background:${cl}"></span>
+      <span class="feed-txt">Node #${id}</span>
+      <span class="feed-pct" style="color:${cl}">${(sc.fraud_probability*100).toFixed(1)}%</span>
+      <span class="verdict ${sc.verdict}" style="font-size:10px;padding:2px 7px">${sc.verdict}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Tabs ──────────────────────────────────────────────────────
+function switchTab(t) {
+  document.getElementById('tab-graph').className = 'tab'+(t==='graph'?' active':'');
+  document.getElementById('tab-exp').className   = 'tab'+(t==='exp'  ?' active':'');
+  document.getElementById('panel-graph').style.display = t==='graph'?'block':'none';
+  document.getElementById('panel-exp').className  = 'exp-panel'+(t==='exp'?' show':'');
+}
+
+// ── Legend toggle ─────────────────────────────────────────────
+let legendOpen = true;
+function toggleLegend() {
+  legendOpen = !legendOpen;
+  const btn  = document.getElementById('legend-toggle');
+  const body = document.querySelectorAll('#legend > *:not(:first-child)');
+  body.forEach(el => el.style.display = legendOpen ? '' : 'none');
+  btn.textContent = legendOpen ? 'Hide' : 'Show';
+}
+
+// ── Zoom ──────────────────────────────────────────────────────
+function zoomIn()    { svg.transition().duration(280).call(zoom.scaleBy,1.4); }
+function zoomOut()   { svg.transition().duration(280).call(zoom.scaleBy,0.7); }
+function resetZoom() { svg.transition().duration(400).call(zoom.transform,d3.zoomIdentity); }
+
+// ── Utils ─────────────────────────────────────────────────────
+const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+const fmt = n => n>=1000 ? (n/1000).toFixed(1)+'k' : n;
+function showErr(m) { document.getElementById('err').textContent=m; }
+function clearErr()  { document.getElementById('err').textContent=''; }
+function loading(on) {
+  document.getElementById('spinner').className='spinner'+(on?' on':'');
+  document.getElementById('spin-txt').textContent=on?'Analysing transaction network…':'';
+}
+
+boot();
+</script>
+</body>
+</html>
