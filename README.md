@@ -376,43 +376,6 @@ python src/visualize_graph.py
 
 ---
 
-## 📚 Citation
-
-**Dataset:**
-```bibtex
-@inproceedings{weber2019antimoney,
-  title     = {Anti-Money Laundering in Bitcoin: Experimenting with Graph Convolutional Networks for Financial Forensics},
-  author    = {Weber, Mark and Domeniconi, Giacomo and Chen, Jie and Weidele, Daniel and Bellei, Claudio and Robinson, Tom and Leiserson, Charles E},
-  booktitle = {KDD Workshop on Anomaly Detection in Finance},
-  year      = {2019}
-}
-```
-
-**GNN Models:**
-```bibtex
-@inproceedings{kipf2017gcn,
-  title={Semi-Supervised Classification with Graph Convolutional Networks},
-  author={Kipf, Thomas N and Welling, Max},
-  booktitle={ICLR}, year={2017}
-}
-@inproceedings{hamilton2017sage,
-  title={Inductive Representation Learning on Large Graphs},
-  author={Hamilton, William L and Ying, Rex and Leskovec, Jure},
-  booktitle={NeurIPS}, year={2017}
-}
-@inproceedings{velickovic2018gat,
-  title={Graph Attention Networks},
-  author={Veli{\v{c}}kovi{\'c}, Petar and Cucurull, Guillem and Casanova, Arantxa and Romero, Adriana and Li{\`o}, Pietro and Bengio, Yoshua},
-  booktitle={ICLR}, year={2018}
-}
-@inproceedings{ying2019gnnexplainer,
-  title={GNNExplainer: Generating Explanations for Graph Neural Networks},
-  author={Ying, Rex and Bourgeois, Dylan and You, Jiaxuan and Zitnik, Marinka and Leskovec, Jure},
-  booktitle={NeurIPS}, year={2019}
-}
-```
-
----
 
 ## 📄 License
 
