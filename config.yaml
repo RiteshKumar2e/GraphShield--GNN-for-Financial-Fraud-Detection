@@ -1,0 +1,38 @@
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  feature_file: elliptic_txs_features.csv
+  class_file: elliptic_txs_classes.csv
+  edge_file: elliptic_txs_edgelist.csv
+
+graph:
+  node_feature_file: node_features.pt
+  edge_index_file: edge_index.pt
+  labels_file: labels.pt
+  masks_file: train_val_test_masks.pt
+
+model:
+  hidden_dim: 64
+  dropout: 0.4
+  heads: 4           # GAT attention heads
+
+training:
+  epochs: 200
+  lr: 0.001
+  weight_decay: 5.0e-4
+  random_state: 42
+  test_size: 0.2
+  val_size: 0.2
+
+results:
+  dir: results
+  metrics_file: results/metrics.csv
+  comparison_file: results/comparison_table.csv
+  figures_dir: results/figures
+  confusion_dir: results/confusion_matrices
+
+explainability:
+  gnnexplainer_epochs: 200
+
+logging:
+  level: INFO

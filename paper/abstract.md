@@ -1,0 +1,5 @@
+# Abstract
+
+Financial fraud detection is a challenging task due to class imbalance, evolving fraud strategies, and complex relationships among users, accounts, merchants, and transactions. Traditional machine learning approaches treat transactions independently and fail to capture relational patterns present in fraud networks.
+
+This paper proposes **GraphShield** — an explainable Graph Neural Network framework that models financial transactions as a graph and learns structural representations using GCN, GraphSAGE, and Graph Attention Network (GAT) architectures. The framework compares traditional machine learning models with graph-based deep learning models using fraud-specific metrics: recall, F1-score, ROC-AUC, and PR-AUC. Explainability is incorporated via GNNExplainer to identify influential nodes, edges, and suspicious transaction paths. The system is evaluated on the Elliptic Bitcoin dataset, demonstrating the advantage of graph-based learning for real-world financial fraud detection.

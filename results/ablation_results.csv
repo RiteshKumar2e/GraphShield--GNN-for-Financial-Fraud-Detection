@@ -1,0 +1,5 @@
+,f1,recall,pr_auc,roc_auc
+GCN + Class Weights,0.6317,0.8867,0.7956,0.9612
+GCN - Class Weights,0.7294,0.6183,0.7939,0.9408
+GCN 2-Layer,0.6077,0.8911,0.7794,0.958
+GCN 3-Layer,0.5952,0.9043,0.7813,0.9579
