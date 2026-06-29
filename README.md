@@ -1,9 +1,6 @@
 <h1 align="center">🛡️ GraphShield</h1>
 <h3 align="center">Explainable Graph Neural Network for Financial Fraud Detection</h3>
 
-<p align="center">
-  <img src="results/figures/transaction_graph.png" alt="Bitcoin Transaction Graph Visualization" width="90%"/>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
