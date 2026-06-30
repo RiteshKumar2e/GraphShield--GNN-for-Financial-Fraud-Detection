@@ -90,11 +90,14 @@ class MultiGraphService:
 
     @staticmethod
     def _build_adj(edge_index: torch.Tensor) -> Dict[int, set]:
+        # Bidirectional so BFS works for directed graphs too
+        # (a node with only incoming edges would return 0 neighbours otherwise)
         adj: Dict[int, set] = defaultdict(set)
         src = edge_index[0].numpy()
         dst = edge_index[1].numpy()
         for s, d in zip(src, dst):
             adj[int(s)].add(int(d))
+            adj[int(d)].add(int(s))
         return adj
 
     # ── Query helpers ────────────────────────────────────────────

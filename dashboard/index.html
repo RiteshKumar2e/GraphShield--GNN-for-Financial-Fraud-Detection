@@ -417,6 +417,13 @@ header nav a:hover { background: var(--surface2); color: var(--text); }
 .exp-table td:first-child { color: var(--muted); width: 140px; }
 .exp-table td:last-child { font-weight: 600; color: var(--text); }
 .what-box { background: var(--blue-lt); border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #1e40af; line-height: 1.6; }
+.mg-exp-area { padding: 4px 0 12px; }
+.mg-exp-area .exp-section { margin-bottom: 14px; }
+.mg-exp-area .exp-table td:first-child { width: 160px; }
+.mg-verdict-badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:12px; font-weight:700; letter-spacing:.3px; }
+.mg-verdict-badge.fraud { background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; }
+.mg-verdict-badge.legit { background:#dcfce7; color:#16a34a; border:1px solid #86efac; }
+.mg-fraud-tag { display:inline-block; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:20px; padding:2px 9px; font-size:11px; font-weight:700; margin-left:4px; }
 
 scrollbar-width: thin;
 ::-webkit-scrollbar { width: 4px; }
@@ -870,10 +877,15 @@ scrollbar-width: thin;
 
       </div><!-- /mg-graph-card -->
 
-      <!-- Node info panel (appears on click) -->
+      <!-- Node info panel (appears on click — quick overlay) -->
       <div class="mg-node-panel" id="mg-node-panel">
         <div class="mg-node-panel-title" id="mg-node-panel-title">Node Details</div>
         <div class="mg-node-grid" id="mg-node-grid"></div>
+      </div>
+
+      <!-- Full explanation (auto-renders when any graph loads) -->
+      <div class="mg-exp-area" id="mg-exp-area" style="display:none">
+        <div id="mg-exp-content"></div>
       </div>
 
     </div><!-- /panel-compare -->
@@ -1405,9 +1417,11 @@ async function switchDataset(key) {
     document.getElementById('mg-node-lbl').textContent =
       `Showing highest-fraud node #${data.target_node}  ·  ${data.nodes.length} nodes  ·  ${data.edges.length} edges`;
     renderMgGraph(data.nodes, data.edges, data.target_node);
+    renderMgExplanation(data.nodes, data.edges, data.target_node, data.stats);
   } catch(e) {
     document.getElementById('mg-graph-area').innerHTML =
       '<div style="height:460px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Could not load graph — is the API running?</div>';
+    hideMgExplanation();
   } finally {
     showMgLoading(false);
   }
@@ -1444,8 +1458,10 @@ async function exploreDsNode() {
     document.getElementById('mg-node-lbl').textContent =
       `Exploring node #${nodeId}  ·  ${data.nodes.length} nodes  ·  ${data.edges.length} edges`;
     renderMgGraph(data.nodes, data.edges, nodeId);
+    renderMgExplanation(data.nodes, data.edges, nodeId, data.stats);
   } catch(e) {
     document.getElementById('mg-node-lbl').textContent = '⚠ Network error';
+    hideMgExplanation();
   } finally {
     showMgLoading(false);
   }
@@ -1458,6 +1474,7 @@ function showMgPending(key) {
   document.getElementById('mg-ds-stats').innerHTML     = '';
   document.getElementById('mg-node-lbl').textContent   = '';
   hideMgNodePanel();
+  hideMgExplanation();
   document.getElementById('mg-graph-area').innerHTML = `
     <div class="mg-pending-card">
       <div class="mg-pending-icon">${DS_ICON[key]||'📊'}</div>
@@ -1568,7 +1585,7 @@ function renderMgGraph(nodes, edges, targetNode) {
         .style('left',(e.offsetX+14)+'px').style('top',(e.offsetY-8)+'px').style('opacity',1);
     })
     .on('mouseout',()=>mgTip.style('opacity',0))
-    .on('click',(e,d)=>{ e.stopPropagation(); onMgNodeClick(d); });
+    .on('click',(e,d)=>{ e.stopPropagation(); document.getElementById('mg-node-input').value=d.id; exploreDsNode(); });
 
   // soft glow halo
   nodeEl.append('circle')
@@ -1638,12 +1655,14 @@ function renderMgGraph(nodes, edges, targetNode) {
   svg.on('click', ()=>hideMgNodePanel());
 }
 
-// ── Node click → info panel ───────────────────────────────────
+// ── Node click → info panel + update explanation ──────────────
 function onMgNodeClick(d) {
-  const verdict = d.label===1 ? '🔴 ILLICIT' : d.label===0 ? '🟢 LICIT' : '⚪ UNKNOWN';
-  const col     = d.label===1 ? 'var(--red)'  : d.label===0 ? 'var(--green)' : 'var(--muted)';
+  const isfraud = d.label === 1;
+  const col     = isfraud ? 'var(--red)' : d.label===0 ? 'var(--green)' : 'var(--muted)';
+  const verdict = isfraud ? '🔴 FRAUD' : d.label===0 ? '🟢 LEGIT' : '⚪ UNKNOWN';
   const pct     = (d.fraud_prob * 100).toFixed(1);
 
+  // Quick overlay panel
   document.getElementById('mg-node-panel-title').textContent = `Node #${d.id}  ·  ${DS_NAMES[mgActiveKey]||mgActiveKey}`;
   document.getElementById('mg-node-grid').innerHTML = `
     <div class="mg-node-tile">
@@ -1651,7 +1670,7 @@ function onMgNodeClick(d) {
       <div class="lbl">Verdict</div>
     </div>
     <div class="mg-node-tile">
-      <div class="val" style="color:${col}">${pct}%</div>
+      <div class="val" style="color:${col};font-size:20px;font-weight:800">${pct}%</div>
       <div class="lbl">Fraud Probability</div>
     </div>
     <div class="mg-node-tile">
@@ -1659,17 +1678,185 @@ function onMgNodeClick(d) {
       <div class="lbl">Node ID</div>
     </div>
     <div class="mg-node-tile">
-      <div class="val">${DS_DOMAIN[mgActiveKey]||'—'}</div>
+      <div class="val" style="font-size:12px">${DS_DOMAIN[mgActiveKey]||'—'}</div>
       <div class="lbl">Domain</div>
     </div>
-    <div class="mg-node-tile">
-      <button style="width:100%;padding:7px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer"
+    <div class="mg-node-tile" style="grid-column:span 2">
+      <button style="width:100%;padding:8px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer"
               onclick="document.getElementById('mg-node-input').value=${d.id};exploreDsNode()">
-        🔍 Explore this node
+        🔍 Explore this node — Build full 2-hop subgraph
       </button>
-      <div class="lbl" style="margin-top:3px">Get 2-hop subgraph</div>
     </div>`;
   document.getElementById('mg-node-panel').className = 'mg-node-panel show';
+
+  // Scroll explanation into view and highlight "Prediction Result" section
+  const expArea = document.getElementById('mg-exp-area');
+  if (expArea && expArea.style.display !== 'none') {
+    // Update the prediction section live without re-rendering the whole explanation
+    const badge = `<span class="mg-verdict-badge ${isfraud?'fraud':'legit'}">${isfraud?'FRAUD':'LEGIT'}</span>`;
+    const fp2 = (d.fraud_prob*100).toFixed(2);
+    const h3s = expArea.querySelectorAll('h3');
+    h3s.forEach(h3 => {
+      if (h3.textContent.includes('Prediction Result')) {
+        const tbl = h3.nextElementSibling;
+        if (tbl && tbl.tagName === 'TABLE') {
+          const rows = tbl.querySelectorAll('tr');
+          rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (!cells.length) return;
+            const label = cells[0].textContent.trim();
+            if (label === 'Node ID')             cells[1].textContent = '#' + d.id.toLocaleString();
+            if (label === 'Verdict')             cells[1].innerHTML   = badge;
+            if (label === 'Fraud Probability')   { cells[1].textContent = fp2 + '%'; cells[1].style.color = col; }
+            if (label === 'Fraud Neighbours')    {
+              const fraudTag = isfraud ? `<span class="mg-fraud-tag">was target</span>` : '';
+              cells[1].style.color = col;
+              cells[1].textContent = '(click Explore to see neighbours)';
+            }
+          });
+        }
+        h3.closest('.exp-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MULTI-DATASET FULL EXPLANATION ENGINE
+// ══════════════════════════════════════════════════════════════
+
+function mgEntityName(key) {
+  return { elliptic:'Bitcoin transaction', credit_card:'credit card transaction',
+           paysim:'mobile payment', insurance:'insurance claim',
+           ecommerce:'e-commerce order' }[key] || 'transaction';
+}
+
+function mgVerdictText(target, fraudNbrs, key) {
+  if (!target) return 'Select a node to see the verdict explanation.';
+  const fp  = (target.fraud_prob * 100).toFixed(1);
+  const ent = mgEntityName(key);
+  const dom = DS_DOMAIN[key] || '';
+  if (target.label === 1) {
+    return `Node #<strong>${target.id}</strong> was classified as <strong style="color:var(--red)">FRAUD</strong>
+    with <strong>${fp}%</strong> fraud probability. The Graph Neural Network detected patterns
+    typical of fraudulent ${ent}s in the <em>${dom}</em> domain.
+    ${fraudNbrs.length > 0
+      ? `It is directly connected to <strong>${fraudNbrs.length} other fraud node${fraudNbrs.length>1?'s':''}</strong>
+         in its 2-hop neighbourhood — fraud rings cluster together, and this neighbour signal strongly
+         boosted the score.`
+      : `Even without direct fraud neighbours, this node's own feature profile closely matches
+         known fraud patterns learned during training.`}`;
+  } else {
+    return `Node #<strong>${target.id}</strong> was classified as <strong style="color:var(--green)">LEGIT</strong>
+    with only <strong>${fp}%</strong> fraud probability. The GNN found no strong fraud signals —
+    neither in the node's own features nor across its neighbourhood.
+    ${fraudNbrs.length > 0
+      ? `Note: ${fraudNbrs.length} nearby node${fraudNbrs.length>1?'s':''} in the subgraph
+         ${fraudNbrs.length>1?'are':'is'} flagged as fraud, but this node's individual features
+         dominate and override the neighbourhood signal.`
+      : `No fraud nodes were found anywhere in the 2-hop subgraph — the surrounding network is clean.`}`;
+  }
+}
+
+function renderMgExplanation(nodes, edges, targetNodeId, stats) {
+  const area = document.getElementById('mg-exp-area');
+  if (!area) return;
+
+  const target     = nodes.find(n => n.id === targetNodeId);
+  const fraudNbrs  = nodes.filter(n => n.label === 1 && n.id !== targetNodeId);
+  const legitNbrs  = nodes.filter(n => n.label === 0 && n.id !== targetNodeId);
+  const fp         = target ? (target.fraud_prob * 100).toFixed(2) : '—';
+  const isfraud    = target ? target.label === 1 : false;
+  const verdictBadge = target
+    ? `<span class="mg-verdict-badge ${isfraud?'fraud':'legit'}">${isfraud?'FRAUD':'LEGIT'}</span>`
+    : '—';
+  const verdictColor = isfraud ? 'var(--red)' : 'var(--green)';
+  const graphTypeStr = stats.directed
+    ? 'Directed blockchain transaction graph (real edges from the Bitcoin network)'
+    : 'KNN similarity graph — tabular data converted to graph via K-Nearest Neighbours on transaction features';
+  const edgeExplain = stats.directed
+    ? '→ arrows show direction of fund flow (source → destination)'
+    : 'Undirected lines — two nodes are connected if they are feature-space neighbours (KNN, k=10)';
+  const icon = DS_ICON[mgActiveKey] || '📊';
+  const ent  = mgEntityName(mgActiveKey);
+
+  document.getElementById('mg-exp-content').innerHTML = `
+
+    <div class="exp-section">
+      <h3>📌 What is this graph showing?</h3>
+      <div class="what-box">
+        This is the <strong>2-hop subgraph</strong> of Node #${targetNodeId} from the
+        <strong>${icon} ${stats.name}</strong> dataset (<em>${stats.domain}</em>).
+        Each <strong>circle (node)</strong> represents one ${ent}.
+        ${stats.directed
+          ? 'Each <strong>arrow (edge)</strong> shows the actual flow of Bitcoin between transactions — a real blockchain connection.'
+          : 'Each <strong>line (edge)</strong> connects two ${ent}s that are <em>similar in feature space</em> — computed using K-Nearest Neighbours. This turns tabular data into a graph the GNN can reason over.'}
+        The Graph Neural Network aggregates fraud signals across up to 2 hops to classify every node.
+      </div>
+    </div>
+
+    <div class="exp-section">
+      <h3>🎯 Node #${targetNodeId} — Prediction Result</h3>
+      <table class="exp-table">
+        <tr><td>Node ID</td><td>#${targetNodeId.toLocaleString()}</td></tr>
+        <tr><td>Verdict</td><td>${verdictBadge}</td></tr>
+        <tr><td>Fraud Probability</td><td style="color:${verdictColor};font-size:16px;font-weight:800">${fp}%</td></tr>
+        <tr><td>Dataset</td><td>${icon} ${stats.name}</td></tr>
+        <tr><td>Domain</td><td>${stats.domain}</td></tr>
+        <tr><td>Subgraph Nodes</td><td>${nodes.length} nodes · ${edges.length} edges</td></tr>
+        <tr><td>Fraud Neighbours</td><td style="color:${fraudNbrs.length>0?'var(--red)':'var(--green)'}">
+          ${fraudNbrs.length > 0
+            ? `⚠ ${fraudNbrs.length} fraud node${fraudNbrs.length>1?'s':''} directly connected`
+            : '✓ None found in 2-hop neighbourhood'}
+        </td></tr>
+        <tr><td>Legit Neighbours</td><td style="color:var(--green)">
+          ${legitNbrs.length} clean node${legitNbrs.length!==1?'s':''} in subgraph
+        </td></tr>
+      </table>
+    </div>
+
+    <div class="exp-section">
+      <h3>🕸️ How to read this graph</h3>
+      <table class="exp-table">
+        <tr><td>🔵 Blue (large)</td><td>Target node — the ${ent} you are exploring</td></tr>
+        <tr><td>🔴 Red circle</td><td><strong>FRAUD</strong> — flagged as fraudulent by the GNN model</td></tr>
+        <tr><td>🟢 Green circle</td><td><strong>LEGIT</strong> — classified as a clean ${ent}</td></tr>
+        <tr><td>Outer arc ring</td><td>Fraud probability arc — full circle = 100% fraud</td></tr>
+        <tr><td>% below node</td><td>GNN fraud probability score for that specific node</td></tr>
+        <tr><td>${stats.directed ? 'Arrows (→)' : 'Lines (edges)'}</td><td>${edgeExplain}</td></tr>
+        <tr><td>🔴 Red edges</td><td>Connection involves at least one fraud node</td></tr>
+        <tr><td>🔵 Blue edges</td><td>Connection involves the target node</td></tr>
+        <tr><td>Click any node</td><td>Opens node details instantly — or type the ID and press Explore Node</td></tr>
+        <tr><td>Drag / Scroll</td><td>Rearrange layout · Zoom in/out to explore dense clusters</td></tr>
+      </table>
+    </div>
+
+    <div class="exp-section">
+      <h3>🧠 Why was this verdict reached?</h3>
+      <div class="what-box">${mgVerdictText(target, fraudNbrs, mgActiveKey)}</div>
+    </div>
+
+    <div class="exp-section">
+      <h3>📊 Dataset Overview</h3>
+      <table class="exp-table">
+        <tr><td>Total Nodes</td><td>${stats.num_nodes.toLocaleString()}</td></tr>
+        <tr><td>Total Edges</td><td>${stats.num_edges.toLocaleString()}</td></tr>
+        <tr><td>Fraud Nodes</td><td style="color:var(--red)">${stats.num_fraud.toLocaleString()}
+          <span style="color:var(--muted);font-weight:400">(${stats.fraud_rate}% fraud rate)</span></td></tr>
+        <tr><td>Legit Nodes</td><td style="color:var(--green)">${stats.num_legit.toLocaleString()}</td></tr>
+        <tr><td>Graph Type</td><td style="font-size:12px">${graphTypeStr}</td></tr>
+        <tr><td>Data Source</td>
+          <td><a href="${stats.kaggle}" target="_blank" rel="noopener"
+               style="color:var(--blue);font-weight:600">View dataset on Kaggle ↗</a></td></tr>
+      </table>
+    </div>`;
+
+  area.style.display = 'block';
+}
+
+function hideMgExplanation() {
+  const area = document.getElementById('mg-exp-area');
+  if (area) { area.style.display = 'none'; document.getElementById('mg-exp-content').innerHTML = ''; }
 }
 
 // ── Legend toggle ─────────────────────────────────────────────
