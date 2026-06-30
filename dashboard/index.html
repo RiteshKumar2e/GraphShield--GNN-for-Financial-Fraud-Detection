@@ -48,31 +48,49 @@ body {
 
 /* ── Header ─────────────────────────────────────────────────── */
 header {
-  background: var(--surface);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8ff 100%);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
-  height: 56px;
+  height: 62px;
   display: flex;
   align-items: center;
   gap: 14px;
   flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 0 var(--border), 0 2px 8px rgba(29,78,216,.06);
   z-index: 10;
+}
+.logo-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.logo-shield {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--blue) 0%, #3b82f6 100%);
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(29,78,216,.30), 0 1px 2px rgba(0,0,0,.12);
+  flex-shrink: 0;
 }
 .logo {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--text);
+  line-height: 1;
 }
 .logo em { color: var(--blue); font-style: normal; }
+.version-badge {
+  font-size: 10px; font-weight: 700;
+  background: var(--blue-lt); color: var(--blue);
+  border: 1px solid #bfdbfe; border-radius: 99px;
+  padding: 2px 8px; letter-spacing: .3px;
+  align-self: flex-start; margin-top: 3px;
+}
 .status-pill {
   font-size: 11px;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 4px 11px;
   border-radius: 99px;
   border: 1.5px solid;
   letter-spacing: .3px;
+  display: flex; align-items: center; gap: 4px;
 }
 .status-pill.online  { color: var(--green); border-color: var(--green); background: var(--green-lt); }
 .status-pill.offline { color: var(--red);   border-color: var(--red);   background: var(--red-lt); }
@@ -82,18 +100,22 @@ header {
   border-left: 1px solid var(--border);
   padding-left: 14px;
   margin-left: 4px;
+  line-height: 1.4;
 }
-header nav { margin-left: auto; display: flex; gap: 4px; }
+.header-desc strong { color: var(--text2); font-weight: 600; display: block; font-size: 11px; margin-bottom: 1px; }
+header nav { margin-left: auto; display: flex; gap: 4px; align-items: center; }
 header nav a {
   font-size: 12px;
   font-weight: 500;
   color: var(--muted);
   text-decoration: none;
-  padding: 5px 10px;
-  border-radius: 6px;
+  padding: 6px 11px;
+  border-radius: 7px;
   transition: background .15s, color .15s;
+  display: flex; align-items: center; gap: 5px;
+  border: 1px solid transparent;
 }
-header nav a:hover { background: var(--surface2); color: var(--text); }
+header nav a:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
 
 /* ── Layout ──────────────────────────────────────────────────── */
 .workspace {
@@ -141,19 +163,7 @@ header nav a:hover { background: var(--surface2); color: var(--text); }
 }
 .search-row input:focus { border-color: var(--blue-mid); background: #fff; }
 .search-row input::placeholder { color: var(--muted); }
-.btn-score {
-  background: var(--blue);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 9px 16px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .15s;
-  white-space: nowrap;
-}
-.btn-score:hover { background: #1e40af; }
+.btn-score-placeholder { display: none; }
 .search-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
 .search-hint a { color: var(--blue); cursor: pointer; text-decoration: none; font-weight: 500; }
 .search-hint a:hover { text-decoration: underline; }
@@ -249,16 +259,7 @@ header nav a:hover { background: var(--surface2); color: var(--text); }
 /* ── Main panel ──────────────────────────────────────────────── */
 .main { display: flex; flex-direction: column; overflow: hidden; }
 
-/* Info banner above graph */
-.graph-info-bar {
-  background: var(--blue-lt);
-  border-bottom: 1.5px solid #bfdbfe;
-  padding: 10px 20px;
-  display: none;
-  align-items: flex-start;
-  gap: 12px;
-}
-.graph-info-bar.show { display: flex; }
+/* Info banner above graph — styled in new CSS block below */
 .info-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 .info-content { flex: 1; }
 .info-title { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 2px; }
@@ -271,21 +272,24 @@ header nav a:hover { background: var(--surface2); color: var(--text); }
   padding: 0 20px;
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 2px;
 }
 .tab {
-  padding: 13px 16px;
+  padding: 14px 18px;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-bottom: 2.5px solid transparent;
   margin-bottom: -1.5px;
-  transition: color .15s;
+  transition: color .15s, background .15s;
   user-select: none;
+  display: flex; align-items: center; gap: 6px;
+  border-radius: 8px 8px 0 0;
+  white-space: nowrap;
 }
-.tab.active { color: var(--blue); border-color: var(--blue); font-weight: 600; }
-.tab:hover:not(.active) { color: var(--text); }
+.tab.active { color: var(--blue); border-color: var(--blue); font-weight: 700; background: var(--blue-lt); }
+.tab:hover:not(.active) { color: var(--text); background: var(--surface2); }
 
 /* Graph area */
 .graph-wrap { flex: 1; position: relative; overflow: hidden; background: #eef2f8; }
@@ -425,7 +429,7 @@ header nav a:hover { background: var(--surface2); color: var(--text); }
 .mg-verdict-badge.legit { background:#dcfce7; color:#16a34a; border:1px solid #86efac; }
 .mg-fraud-tag { display:inline-block; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:20px; padding:2px 9px; font-size:11px; font-weight:700; margin-left:4px; }
 
-scrollbar-width: thin;
+* { scrollbar-width: thin; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
@@ -619,19 +623,107 @@ scrollbar-width: thin;
 .mg-node-tile { background:var(--surface2); border-radius:8px; padding:10px; border:1.5px solid var(--border); }
 .mg-node-tile .val { font-size:15px; font-weight:800; color:var(--text); }
 .mg-node-tile .lbl { font-size:10px; color:var(--muted); margin-top:2px; }
+
+/* ── Footer ─────────────────────────────────────────────────── */
+footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+  z-index: 10;
+  gap: 12px;
+}
+.footer-left, .footer-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.footer-sep { color: var(--border2); font-size: 13px; }
+footer a { color: var(--blue); text-decoration: none; font-weight: 500; }
+footer a:hover { text-decoration: underline; }
+.footer-brand { font-weight: 700; color: var(--text2); }
+#footer-time { font-family: monospace; font-size: 11px; color: var(--muted); letter-spacing: .5px; }
+
+/* ── Stat tile improvements ────────────────────────────────── */
+.stat-tile { transition: box-shadow .15s, transform .15s; cursor: default; position: relative; }
+.stat-tile:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.stat-tile .tile-icon { font-size: 14px; margin-bottom: 4px; display: block; }
+
+/* ── Result card risk border ────────────────────────────────── */
+.result-card.high { border-left: 3px solid var(--red); }
+.result-card.med  { border-left: 3px solid var(--amber); }
+.result-card.low  { border-left: 3px solid var(--green); }
+.result-card .result-header { background: var(--surface2); }
+
+/* ── Sidebar section label with icon ─────────────────────────── */
+.sec-label { display: flex; align-items: center; gap: 6px; }
+.sec-label .sec-icon { font-size: 13px; letter-spacing: 0; text-transform: none; }
+
+/* ── Info bar ─────────────────────────────────────────────────── */
+.graph-info-bar {
+  background: linear-gradient(135deg, #eff6ff 0%, #e0edff 100%);
+  border-bottom: 1.5px solid #bfdbfe;
+  padding: 10px 20px;
+  display: none;
+  align-items: flex-start;
+  gap: 12px;
+}
+.graph-info-bar.show { display: flex; }
+
+/* ── Empty state improved ─────────────────────────────────────── */
+.empty-icon { font-size: 56px; opacity: .2; filter: grayscale(30%); }
+
+/* ── Section divider ─────────────────────────────────────────── */
+.sidebar-section { position: relative; }
+.sidebar-section:first-child { border-top: none; }
+
+/* ── Better search button ─────────────────────────────────────── */
+.btn-score {
+  background: linear-gradient(135deg, var(--blue) 0%, #3b82f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s, box-shadow .15s;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(29,78,216,.25);
+}
+.btn-score:hover { opacity: .9; box-shadow: 0 4px 12px rgba(29,78,216,.35); }
+
+/* ── Feed time badge ─────────────────────────────────────────── */
+.feed-time { font-size: 10px; color: var(--muted); font-family: monospace; }
 </style>
 </head>
 <body>
 
 <!-- ════ HEADER ════ -->
 <header>
-  <div class="logo">Graph<em>Shield</em></div>
+  <div class="logo-wrap">
+    <div class="logo-shield">
+      <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+        <path d="M14 2L4 6.5v7.5c0 5.8 4.3 11.2 10 12.5C19.7 25.2 24 19.8 24 14V6.5L14 2z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M9.5 14l3 3 6-6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo">Graph<em>Shield</em></div>
+    </div>
+    <span class="version-badge">v2.0</span>
+  </div>
   <span class="status-pill offline" id="status-pill">● Connecting…</span>
-  <span class="header-desc">Explainable GNN · Elliptic Bitcoin Dataset · 46,564 Transactions</span>
+  <span class="header-desc">
+    <strong>Explainable GNN · Financial Fraud Detection</strong>
+    Elliptic Bitcoin Dataset · 46,564 Transactions
+  </span>
   <nav>
-    <a href="/api/docs" target="_blank">API Docs</a>
-    <a href="/api/v1/health" target="_blank">Health</a>
-    <a href="/api/v1/stats" target="_blank">Stats</a>
+    <a href="/api/docs" target="_blank">📄 API Docs</a>
+    <a href="/api/v1/health" target="_blank">💚 Health</a>
+    <a href="/api/v1/stats" target="_blank">📊 Stats</a>
   </nav>
 </header>
 
@@ -642,7 +734,7 @@ scrollbar-width: thin;
 
     <!-- Score a node -->
     <div class="sidebar-section">
-      <div class="sec-label">Inspect Transaction Node</div>
+      <div class="sec-label"><span class="sec-icon">🔎</span> Inspect Transaction Node</div>
       <div class="search-row">
         <input type="number" id="node-input" placeholder="Enter Node ID  (e.g. 27695)" min="0"/>
         <button class="btn-score" onclick="scoreNode()">Score</button>
@@ -662,7 +754,7 @@ scrollbar-width: thin;
 
     <!-- Result -->
     <div class="sidebar-section">
-      <div class="sec-label">Fraud Score</div>
+      <div class="sec-label"><span class="sec-icon">🎯</span> Fraud Score</div>
       <div class="result-card" id="result-card">
         <div class="result-header">
           <span class="result-node-id" id="rc-id">Node #–</span>
@@ -686,7 +778,7 @@ scrollbar-width: thin;
 
     <!-- Top features -->
     <div class="sidebar-section" id="feat-section" style="display:none">
-      <div class="sec-label">Top Predictive Features</div>
+      <div class="sec-label"><span class="sec-icon">⭐</span> Top Predictive Features</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:10px">
         Features ranked by influence on this node's fraud score
       </div>
@@ -695,20 +787,20 @@ scrollbar-width: thin;
 
     <!-- Dataset stats -->
     <div class="sidebar-section">
-      <div class="sec-label">Dataset Overview</div>
+      <div class="sec-label"><span class="sec-icon">📈</span> Dataset Overview</div>
       <div class="stats-grid">
-        <div class="stat-tile"><div class="val blue" id="st-nodes">–</div><div class="lbl">Total Transactions</div></div>
-        <div class="stat-tile"><div class="val" id="st-edges">–</div><div class="lbl">Graph Edges</div></div>
-        <div class="stat-tile"><div class="val red" id="st-illicit">–</div><div class="lbl">Illicit (Fraud)</div></div>
-        <div class="stat-tile"><div class="val" id="st-rate">–</div><div class="lbl">Fraud Rate</div></div>
-        <div class="stat-tile"><div class="val" id="st-model">–</div><div class="lbl">Active Model</div></div>
-        <div class="stat-tile"><div class="val green" id="st-preds">0</div><div class="lbl">Queries Served</div></div>
+        <div class="stat-tile" style="border-top:2.5px solid var(--blue)"><span class="tile-icon">💎</span><div class="val blue" id="st-nodes">–</div><div class="lbl">Total Transactions</div></div>
+        <div class="stat-tile" style="border-top:2.5px solid var(--border2)"><span class="tile-icon">🔗</span><div class="val" id="st-edges">–</div><div class="lbl">Graph Edges</div></div>
+        <div class="stat-tile" style="border-top:2.5px solid var(--red)"><span class="tile-icon">🚨</span><div class="val red" id="st-illicit">–</div><div class="lbl">Illicit (Fraud)</div></div>
+        <div class="stat-tile" style="border-top:2.5px solid var(--amber)"><span class="tile-icon">📉</span><div class="val" id="st-rate">–</div><div class="lbl">Fraud Rate</div></div>
+        <div class="stat-tile" style="border-top:2.5px solid var(--purple)"><span class="tile-icon">🤖</span><div class="val" id="st-model" style="font-size:13px">–</div><div class="lbl">Active Model</div></div>
+        <div class="stat-tile" style="border-top:2.5px solid var(--green)"><span class="tile-icon">✅</span><div class="val green" id="st-preds">0</div><div class="lbl">Queries Served</div></div>
       </div>
     </div>
 
     <!-- Recent queries -->
     <div class="sidebar-section">
-      <div class="sec-label">Recent Queries</div>
+      <div class="sec-label"><span class="sec-icon">🕒</span> Recent Queries</div>
       <div class="feed" id="feed">
         <div style="font-size:12px;color:var(--muted)">No queries yet — score a node above</div>
       </div>
@@ -730,8 +822,8 @@ scrollbar-width: thin;
 
     <!-- Tabs -->
     <div class="tabs">
-      <div class="tab active" id="tab-graph"   onclick="switchTab('graph')">Transaction Subgraph</div>
-      <div class="tab"        id="tab-exp"     onclick="switchTab('exp')">Full Explanation</div>
+      <div class="tab active" id="tab-graph"   onclick="switchTab('graph')">📊 Transaction Subgraph</div>
+      <div class="tab"        id="tab-exp"     onclick="switchTab('exp')">🔍 Full Explanation</div>
       <div class="tab"        id="tab-compare" onclick="switchTab('compare')">🌐 Multi-Dataset</div>
     </div>
 
@@ -741,13 +833,13 @@ scrollbar-width: thin;
 
       <!-- Empty state -->
       <div class="empty" id="empty">
-        <div class="empty-icon">⬡</div>
+        <div class="empty-icon">🛡️</div>
         <h3>Transaction Network Explorer</h3>
-        <p>Enter any transaction node ID on the left and press <strong>Score</strong>.<br/>
-        The graph will show that transaction's 2-hop network — who it sent money to and received from — with fraud nodes highlighted in red.</p>
-        <p style="margin-top:8px;font-size:12px">
-          Try node <strong style="color:var(--blue);cursor:pointer" onclick="quickScore(27695)">27695</strong>
-          — a known fraud ring hub with 30 connections.
+        <p>Enter any transaction node ID on the left and press <strong>Score</strong> to analyse its fraud risk.<br/>
+        The graph renders that transaction's 2-hop network — who it sent money to and received from — with fraud nodes highlighted in red.</p>
+        <p style="margin-top:10px;font-size:12px;background:var(--blue-lt);border:1px solid #bfdbfe;padding:8px 14px;border-radius:8px;color:#1e40af">
+          💡 Quick start — try node <strong style="cursor:pointer;text-decoration:underline" onclick="quickScore(27695)">27695</strong>
+          (known fraud hub · 30 connections) or <strong style="cursor:pointer;text-decoration:underline" onclick="quickScore(100)">100</strong> (licit)
         </p>
       </div>
 
@@ -893,6 +985,24 @@ scrollbar-width: thin;
   </div>
 </div>
 
+<!-- ════ FOOTER ════ -->
+<footer>
+  <div class="footer-left">
+    <span class="footer-brand">GraphShield</span>
+    <span class="footer-sep">·</span>
+    <span>Explainable GNN for Financial Fraud Detection</span>
+    <span class="footer-sep">·</span>
+    <span>PyTorch Geometric · D3.js v7</span>
+  </div>
+  <div class="footer-right">
+    <span id="footer-time"></span>
+    <span class="footer-sep">·</span>
+    <a href="/api/docs" target="_blank">API Reference</a>
+    <span class="footer-sep">·</span>
+    <a href="https://www.kaggle.com/datasets/ellipticco/elliptic-data-set" target="_blank">Dataset ↗</a>
+  </div>
+</footer>
+
 <script>
 const API = '/api/v1';
 let svg, zoom, sim;
@@ -904,6 +1014,8 @@ async function boot() {
   await fetchStats();
   setInterval(fetchStats, 15000);
   document.getElementById('node-input').addEventListener('keydown', e => { if(e.key==='Enter') scoreNode(); });
+  const updateClock = () => { const el=document.getElementById('footer-time'); if(el) el.textContent=new Date().toLocaleTimeString(); };
+  updateClock(); setInterval(updateClock, 1000);
 }
 
 // ── Stats ────────────────────────────────────────────────────
@@ -953,7 +1065,7 @@ function renderCard(sc) {
   const fp  = sc.fraud_probability;
   const pct = (fp*100).toFixed(2)+'%';
   const cls = fp>=.7?'high':fp>=.35?'med':'low';
-  document.getElementById('result-card').className = 'result-card show';
+  document.getElementById('result-card').className = 'result-card show ' + cls;
   set('rc-id',      'Node #'+sc.node_id);
   set('rc-prob',    pct);
   set('rc-conf',    sc.confidence+' confidence');
