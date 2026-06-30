@@ -1307,30 +1307,51 @@ const DS_KAGGLE = {
   ecommerce:   'https://www.kaggle.com/datasets/shriyashjagtap/fraudulent-e-commerce-transactions',
 };
 
-// ── Init (called once when tab opens) ───────────────────────
-async function initMultiGraph() {
-  mgLoaded = true;
-  try {
-    mgDatasets = await fetch(`${API}/datasets`).then(r => r.json());
-  } catch(e) { mgDatasets = []; }
-
-  const trainedKeys = new Set(mgDatasets.map(d => d.key));
-
-  // Render dataset tabs for ALL 5 known datasets
+// ── Render the 5 dataset tabs ────────────────────────────────
+function renderMgTabs(trainedKeys) {
   document.getElementById('mg-tabs').innerHTML = ALL_DS_KEYS.map(key => {
     const trained = trainedKeys.has(key);
     const color   = DS_COLOR[key];
     const style   = trained
       ? `background:${color};color:#fff;border-color:${color}`
-      : 'opacity:0.65';
+      : 'opacity:0.7';
     return `<div class="mg-tab" id="mgtab-${key}" onclick="switchDataset('${key}')" style="${style}">
               ${DS_ICON[key]} ${DS_NAMES[key]}${trained?' ✓':''}
             </div>`;
   }).join('');
+}
 
-  // Auto-select first trained dataset (or first key if none trained)
-  const firstKey = ALL_DS_KEYS.find(k => trainedKeys.has(k)) || ALL_DS_KEYS[0];
-  switchDataset(firstKey);
+// ── Init (called once when tab opens) ───────────────────────
+async function initMultiGraph() {
+  mgLoaded = true;
+
+  // 1. Render all 5 tabs IMMEDIATELY from static list (don't wait for API)
+  renderMgTabs(new Set());
+
+  // 2. Show Elliptic pending state right away so UI isn't blank
+  switchDataset('elliptic');
+
+  // 3. Fetch trained datasets with a 6-second timeout
+  try {
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), 6000);
+    const resp = await fetch(`${API}/datasets`, { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (resp.ok) {
+      const json = await resp.json();
+      mgDatasets = Array.isArray(json) ? json : [];
+    }
+  } catch(e) {
+    mgDatasets = [];   // API offline or timed out — all tabs stay as pending
+  }
+
+  // 4. Update tabs with trained/pending status now that we know which are trained
+  const trainedKeys = new Set(mgDatasets.map(d => d.key));
+  renderMgTabs(trainedKeys);
+
+  // 5. Switch to first trained dataset (or keep showing Elliptic pending)
+  const firstTrained = ALL_DS_KEYS.find(k => trainedKeys.has(k));
+  if (firstTrained) switchDataset(firstTrained);
 }
 
 // ── Switch active dataset ─────────────────────────────────────
@@ -1372,12 +1393,12 @@ async function switchDataset(key) {
   document.getElementById('mg-legend').style.display   = 'flex';
   document.getElementById('mg-node-input').value       = '';
   hideMgNodePanel();
-  showMgLoading(true);
 
-  // Reset graph area (remove pending card if present)
+  // Always reset graph area to a clean SVG + loading state
   const area = document.getElementById('mg-graph-area');
   area.innerHTML = '<svg id="mg-svg"></svg><div class="mg-tip" id="mg-tip"></div>'
                  + '<div class="mg-graph-loading" id="mg-loading" style="display:flex">⟳ Loading graph…</div>';
+  showMgLoading(true);
 
   try {
     const data = await fetch(`${API}/datasets/${key}/sample`).then(r => r.json());

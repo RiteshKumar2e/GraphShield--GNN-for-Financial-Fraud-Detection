@@ -2,12 +2,16 @@
 Manages multiple dataset graphs in memory for the Multi-Dataset panel.
 After Notebook 10 runs, each dataset saves a graph.pt to data/processed/{key}/.
 This service loads all available graphs and serves subgraph queries.
+
+Compatible with Python 3.8+.
 """
+from __future__ import annotations
 
 import numpy as np
 import torch
 from collections import defaultdict
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 DATASET_ORDER = ['elliptic', 'credit_card', 'paysim', 'insurance', 'ecommerce']
 
@@ -23,48 +27,49 @@ DATASET_META = {
 class MultiGraphService:
 
     def __init__(self, processed_dir: str = 'data/processed'):
-        self._base = Path(processed_dir)
-        self._graphs: dict = {}
+        self._base: Path = Path(processed_dir)
+        self._graphs: Dict[str, dict] = {}
         self.loaded: bool = False
 
     # ── Load ────────────────────────────────────────────────────
 
-    def load(self):
+    def load(self) -> None:
         self._try_load_elliptic()
         for key in ['credit_card', 'paysim', 'insurance', 'ecommerce']:
             self._try_load_saved(key)
         self.loaded = True
         loaded_names = [DATASET_META[k]['name'] for k in self._graphs]
-        print(f"  [MultiGraph] Loaded: {loaded_names if loaded_names else 'none (run Notebook 10)'}")
+        print(f"  [MultiGraph] Loaded: {loaded_names if loaded_names else 'none — run Notebook 10 for tabular datasets'}")
 
-    def _try_load_elliptic(self):
+    def _try_load_elliptic(self) -> None:
         ei_path = self._base / 'edge_index.pt'
         y_path  = self._base / 'labels.pt'
         if not (ei_path.exists() and y_path.exists()):
+            print("  [MultiGraph] elliptic: processed files not found (run Notebook 02)")
             return
         try:
             edge_index = torch.load(ei_path, weights_only=True)
             y          = torch.load(y_path,  weights_only=True)
 
-            # fraud_probs may have been saved by NB10 for all nodes
+            # Better fraud probs saved by NB10 (all nodes); fall back to binary labels
             fp_path = self._base / 'elliptic' / 'graph.pt'
-            fraud_probs = y.float().numpy()
+            fraud_probs: np.ndarray = y.float().numpy()
             if fp_path.exists():
                 saved = torch.load(fp_path, weights_only=True)
                 if 'fraud_probs' in saved:
                     fraud_probs = saved['fraud_probs'].numpy()
 
             self._graphs['elliptic'] = {
-                'edge_index': edge_index,
-                'y':          y,
-                'adj':        self._build_adj(edge_index),
+                'edge_index':  edge_index,
+                'y':           y,
+                'adj':         self._build_adj(edge_index),
                 'fraud_probs': fraud_probs,
-                'directed':   True,
+                'directed':    True,
             }
         except Exception as exc:
             print(f"  [MultiGraph] elliptic load error: {exc}")
 
-    def _try_load_saved(self, key: str):
+    def _try_load_saved(self, key: str) -> None:
         path = self._base / key / 'graph.pt'
         if not path.exists():
             return
@@ -84,8 +89,8 @@ class MultiGraphService:
             print(f"  [MultiGraph] {key} load error: {exc}")
 
     @staticmethod
-    def _build_adj(edge_index: torch.Tensor) -> dict:
-        adj: dict = defaultdict(set)
+    def _build_adj(edge_index: torch.Tensor) -> Dict[int, set]:
+        adj: Dict[int, set] = defaultdict(set)
         src = edge_index[0].numpy()
         dst = edge_index[1].numpy()
         for s, d in zip(src, dst):
@@ -94,10 +99,10 @@ class MultiGraphService:
 
     # ── Query helpers ────────────────────────────────────────────
 
-    def available_keys(self) -> list[str]:
+    def available_keys(self) -> List[str]:
         return [k for k in DATASET_ORDER if k in self._graphs]
 
-    def get_stats(self, key: str) -> dict | None:
+    def get_stats(self, key: str) -> Optional[dict]:
         g = self._graphs.get(key)
         if g is None:
             return None
@@ -115,7 +120,7 @@ class MultiGraphService:
             'num_fraud':  int((y == 1).sum()),
             'num_legit':  int((y == 0).sum()),
             'fraud_rate': round(float((y == 1).mean() * 100), 2),
-            'directed':   g.get('directed', False),
+            'directed':   bool(g.get('directed', False)),
         }
 
     def get_sample_node(self, key: str) -> int:
@@ -130,7 +135,8 @@ class MultiGraphService:
             return 0
         return int(fraud_idx[np.argmax(fp[fraud_idx])])
 
-    def k_hop_subgraph(self, key: str, node_id: int, k: int = 2, max_nodes: int = 40):
+    def k_hop_subgraph(self, key: str, node_id: int,
+                       k: int = 2, max_nodes: int = 40) -> Tuple[List[dict], List[dict]]:
         g = self._graphs.get(key)
         if g is None:
             return [], []
@@ -140,10 +146,10 @@ class MultiGraphService:
         fp  = g['fraud_probs']
 
         # BFS to collect k-hop neighbourhood
-        visited  = {node_id}
-        frontier = {node_id}
+        visited:  set = {node_id}
+        frontier: set = {node_id}
         for _ in range(k):
-            nxt = set()
+            nxt: set = set()
             for n in frontier:
                 for nb in adj.get(n, set()):
                     if nb not in visited:
@@ -157,15 +163,15 @@ class MultiGraphService:
         visited_set  = set(visited_list)
 
         nodes = [{
-            'id':        nid,
-            'label':     int(y[nid]),
+            'id':         nid,
+            'label':      int(y[nid]),
             'fraud_prob': round(float(fp[nid]), 4),
-            'is_target': nid == node_id,
+            'is_target':  nid == node_id,
         } for nid in visited_list]
 
-        ei   = g['edge_index'].numpy()
+        ei        = g['edge_index'].numpy()
         seen: set = set()
-        edges = []
+        edges: List[dict] = []
         for s, d in zip(ei[0], ei[1]):
             s, d = int(s), int(d)
             if s in visited_set and d in visited_set:
@@ -177,7 +183,8 @@ class MultiGraphService:
         return nodes, edges
 
 
-_instance: MultiGraphService | None = None
+_instance: Optional[MultiGraphService] = None
+
 
 def get_multi_graph_service() -> MultiGraphService:
     global _instance
