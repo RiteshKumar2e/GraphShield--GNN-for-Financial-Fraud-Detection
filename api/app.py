@@ -12,7 +12,9 @@ from pathlib import Path
 
 from api.services.model_service import get_model_service
 from api.services.graph_service import get_graph_service
-from api.routers import score, explain, health
+from api.services.multi_graph_service import get_multi_graph_service
+from api.routers import score, explain, health, comparison
+from api.routers import multi_graph
 
 
 @asynccontextmanager
@@ -27,9 +29,12 @@ async def lifespan(app: FastAPI):
     ms.load()
     print(f"  Model loaded: {ms.model_name}")
 
+    mgs = get_multi_graph_service()
+    mgs.load()
+
     yield  # app runs here
 
-    # shutdown (nothing to clean up for now)
+    # shutdown
     print("GraphShield API shutting down.")
 
 
@@ -50,9 +55,11 @@ app.add_middleware(
 )
 
 # Routers
-app.include_router(score.router,  prefix="/api/v1")
-app.include_router(explain.router, prefix="/api/v1")
-app.include_router(health.router,  prefix="/api/v1")
+app.include_router(score.router,       prefix="/api/v1")
+app.include_router(explain.router,     prefix="/api/v1")
+app.include_router(health.router,      prefix="/api/v1")
+app.include_router(comparison.router,  prefix="/api/v1")
+app.include_router(multi_graph.router, prefix="/api/v1")
 
 # Serve dashboard
 _dashboard = Path("dashboard")

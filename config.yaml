@@ -5,6 +5,32 @@ data:
   class_file: elliptic_txs_classes.csv
   edge_file: elliptic_txs_edgelist.csv
 
+  # Additional fraud datasets (download from Kaggle — see Notebook 10)
+  # Each folder should contain the CSV after download + unzip
+  credit_card:
+    dir: data/raw/credit_card
+    file: creditcard.csv
+    kaggle: mlg-ulb/creditcardfraud
+    domain: Banking / Credit Card
+
+  paysim:
+    dir: data/raw/paysim
+    file: online_payments_fraud.csv
+    kaggle: rupakroy/online-payments-fraud-detection-dataset
+    domain: Mobile Payments / Fintech
+
+  insurance:
+    dir: data/raw/insurance
+    file: fraud_oracle.csv
+    kaggle: shivamb/vehicle-claim-fraud-detection
+    domain: Vehicle Insurance Claims
+
+  ecommerce:
+    dir: data/raw/ecommerce
+    file: Fraudulent_E-Commerce_Transaction_Data.csv
+    kaggle: shriyashjagtap/fraudulent-e-commerce-transactions
+    domain: E-Commerce / Online Retail
+
 graph:
   node_feature_file: node_features.pt
   edge_index_file: edge_index.pt
@@ -30,6 +56,12 @@ results:
   comparison_file: results/comparison_table.csv
   figures_dir: results/figures
   confusion_dir: results/confusion_matrices
+  multi_dataset_dir: results/multi_dataset
+
+multi_dataset:
+  max_samples: 30000   # max nodes per tabular dataset (for memory efficiency)
+  knn_k: 10            # KNN neighbours for graph construction
+  knn_metric: euclidean
 
 explainability:
   gnnexplainer_epochs: 200

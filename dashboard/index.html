@@ -422,6 +422,196 @@ scrollbar-width: thin;
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+/* ── Multi-Dataset Comparison Panel ──────────────────────────── */
+.compare-panel {
+  flex: 1; overflow-y: auto; padding: 24px;
+  display: none; background: var(--bg);
+}
+.compare-panel.show { display: block; }
+.compare-hdr {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 20px; gap: 16px;
+}
+.compare-hdr h2 { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
+.compare-hdr p  { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.compare-controls { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.compare-controls select {
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 7px 12px; font-size: 12px; color: var(--text);
+  background: var(--surface); outline: none; cursor: pointer;
+}
+.compare-controls button {
+  background: var(--blue); color: #fff; border: none; border-radius: 8px;
+  padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+  white-space: nowrap;
+}
+.compare-controls button:hover { background: #1e40af; }
+.no-data-banner {
+  background: var(--amber-lt); border: 1.5px solid #fcd34d;
+  border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px;
+  font-size: 12px; color: var(--amber); display: flex; gap: 12px;
+  align-items: flex-start; line-height: 1.6;
+}
+.no-data-banner code { background: #fef9c3; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+.dataset-cards-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px; margin-bottom: 20px;
+}
+.ds-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  box-shadow: var(--shadow-sm); transition: box-shadow .15s, transform .15s;
+}
+.ds-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.ds-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ds-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.ds-card-title { font-size: 12px; font-weight: 700; color: var(--text); }
+.ds-card-domain { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.ds-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+.ds-stat { font-size: 10px; color: var(--muted); }
+.ds-stat span { font-weight: 700; color: var(--text); display: block; font-size: 12px; }
+.ds-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 99px;
+  text-align: center; display: inline-block;
+}
+.ds-available { background: var(--green-lt); color: var(--green); border: 1px solid #86efac; }
+.ds-pending   { background: var(--amber-lt); color: var(--amber); border: 1px solid #fcd34d; }
+.ds-graph-type { font-size: 10px; color: var(--muted); margin-top: 7px; font-family: monospace; }
+.ds-kaggle-btn {
+  display: block; margin-top: 9px; text-align: center;
+  font-size: 10px; font-weight: 600; color: var(--blue);
+  text-decoration: none; padding: 5px 0;
+  border: 1px solid var(--blue-mid); border-radius: 6px;
+  transition: background .12s;
+}
+.ds-kaggle-btn:hover { background: var(--blue-lt); }
+.charts-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;
+}
+.chart-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.chart-card h3 {
+  font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 12px;
+}
+.compare-table-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-sm);
+  margin-bottom: 14px; overflow-x: auto;
+}
+.compare-table-card h3 { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.ctable { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ctable th {
+  background: var(--surface2); border-bottom: 2px solid var(--border);
+  padding: 7px 10px; text-align: left; font-size: 10px;
+  font-weight: 700; color: var(--muted); letter-spacing: .5px; text-transform: uppercase;
+}
+.ctable td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.ctable tr:last-child td { border-bottom: none; }
+.ctable tr:hover td { background: var(--surface2); }
+.m-best  { color: var(--green); font-weight: 700; }
+.m-badge {
+  padding: 2px 8px; border-radius: 99px; font-weight: 700; font-size: 10px;
+  display: inline-block;
+}
+/* ── Multi-Dataset Knowledge Graph Panel ── */
+.mg-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.mg-tab {
+  display:flex; align-items:center; gap:6px; padding:8px 16px;
+  border:1.5px solid var(--border); border-radius:99px; font-size:12px;
+  font-weight:600; color:var(--muted); cursor:pointer; transition:all .15s;
+  background:var(--surface); white-space:nowrap; user-select:none;
+}
+.mg-tab:hover { border-color:var(--blue); color:var(--text); }
+.mg-graph-card {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm);
+  margin-bottom:14px;
+}
+.mg-graph-hdr {
+  background:var(--surface2); border-bottom:1.5px solid var(--border);
+  padding:12px 16px; display:flex; align-items:center;
+  justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+.mg-ds-title  { font-size:14px; font-weight:800; color:var(--text); }
+.mg-ds-domain { font-size:11px; color:var(--muted); margin-top:2px; }
+.mg-ds-stats  { display:flex; gap:20px; flex-wrap:wrap; }
+.mg-ds-stat   { font-size:11px; color:var(--muted); text-align:center; }
+.mg-ds-stat strong { display:block; font-size:14px; font-weight:800; color:var(--text); }
+.mg-ctrl-row {
+  padding:10px 16px; background:var(--surface);
+  border-bottom:1.5px solid var(--border);
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.mg-ctrl-row input {
+  border:1.5px solid var(--border); border-radius:8px; padding:7px 12px;
+  font-size:12px; width:150px; outline:none;
+  background:var(--surface2); color:var(--text);
+}
+.mg-ctrl-row input:focus { border-color:var(--blue); }
+.mg-ctrl-row button {
+  background:var(--blue); color:#fff; border:none; border-radius:8px;
+  padding:7px 16px; font-size:12px; font-weight:700; cursor:pointer;
+}
+.mg-ctrl-row button:hover { background:#1e40af; }
+.mg-node-lbl { font-size:11px; color:var(--muted); font-style:italic; }
+.mg-graph-area {
+  position:relative; height:460px; background:#f8fafc; overflow:hidden;
+}
+.mg-graph-area svg { width:100%; height:100%; }
+.mg-graph-loading {
+  position:absolute; inset:0; display:flex; align-items:center;
+  justify-content:center; background:rgba(248,250,252,0.88);
+  font-size:13px; color:var(--muted); gap:10px; z-index:5;
+}
+.mg-pending-card {
+  height:460px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:14px;
+  background:#f8fafc; color:var(--muted); text-align:center; padding:24px;
+}
+.mg-pending-icon { font-size:44px; }
+.mg-pending-card h3 { font-size:14px; font-weight:700; color:var(--text); margin:0; }
+.mg-pending-card p  { font-size:12px; margin:0; line-height:1.7; }
+.mg-pending-card code { background:#f1f5f9; padding:1px 5px; border-radius:4px; font-size:11px; }
+.mg-kaggle-link {
+  font-size:12px; font-weight:600; color:var(--blue); text-decoration:none;
+  border:1.5px solid var(--blue); border-radius:8px; padding:7px 18px;
+  transition:background .12s;
+}
+.mg-kaggle-link:hover { background:var(--blue-lt); }
+.mg-graph-legend {
+  display:flex; gap:16px; padding:10px 16px; border-top:1.5px solid var(--border);
+  font-size:11px; color:var(--muted); background:var(--surface);
+  flex-wrap:wrap; align-items:center; justify-content:space-between;
+}
+.mg-legend-items { display:flex; gap:16px; flex-wrap:wrap; }
+.mg-legend-item  { display:flex; align-items:center; gap:5px; }
+.mg-tip {
+  position:absolute; background:rgba(17,24,39,.92); color:#f9fafb;
+  padding:8px 12px; border-radius:8px; font-size:11px;
+  pointer-events:none; opacity:0; transition:opacity .12s;
+  max-width:210px; line-height:1.55; z-index:10;
+}
+.mg-node-panel {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:var(--radius); padding:14px; box-shadow:var(--shadow-sm);
+  margin-bottom:14px; display:none;
+}
+.mg-node-panel.show { display:block; }
+.mg-node-panel-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:10px; }
+.mg-node-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;
+}
+.mg-node-tile { background:var(--surface2); border-radius:8px; padding:10px; border:1.5px solid var(--border); }
+.mg-node-tile .val { font-size:15px; font-weight:800; color:var(--text); }
+.mg-node-tile .lbl { font-size:10px; color:var(--muted); margin-top:2px; }
 </style>
 </head>
 <body>
@@ -533,8 +723,9 @@ scrollbar-width: thin;
 
     <!-- Tabs -->
     <div class="tabs">
-      <div class="tab active" id="tab-graph" onclick="switchTab('graph')">Transaction Subgraph</div>
-      <div class="tab" id="tab-exp"   onclick="switchTab('exp')">Full Explanation</div>
+      <div class="tab active" id="tab-graph"   onclick="switchTab('graph')">Transaction Subgraph</div>
+      <div class="tab"        id="tab-exp"     onclick="switchTab('exp')">Full Explanation</div>
+      <div class="tab"        id="tab-compare" onclick="switchTab('compare')">🌐 Multi-Dataset</div>
     </div>
 
     <!-- Graph panel -->
@@ -629,6 +820,63 @@ scrollbar-width: thin;
     <div class="exp-panel" id="panel-exp">
       <div id="exp-content" style="color:var(--muted);font-size:13px">Run a prediction first.</div>
     </div>
+
+    <!-- ════ MULTI-DATASET KNOWLEDGE GRAPHS PANEL ════ -->
+    <div class="compare-panel" id="panel-compare">
+
+      <!-- Dataset selector tabs (rendered by JS) -->
+      <div class="mg-tabs" id="mg-tabs">
+        <div class="mg-tab" style="cursor:default;color:var(--muted)">⟳ Loading datasets…</div>
+      </div>
+
+      <!-- Graph card -->
+      <div class="mg-graph-card">
+
+        <!-- Header: dataset name + live stats -->
+        <div class="mg-graph-hdr" id="mg-graph-hdr">
+          <div>
+            <div class="mg-ds-title"  id="mg-ds-title">Select a dataset above</div>
+            <div class="mg-ds-domain" id="mg-ds-domain">—</div>
+          </div>
+          <div class="mg-ds-stats" id="mg-ds-stats"></div>
+        </div>
+
+        <!-- Node explore controls (hidden until dataset loaded) -->
+        <div class="mg-ctrl-row" id="mg-ctrl-row" style="display:none">
+          <input id="mg-node-input" type="number" min="0" placeholder="Node ID  (e.g. 1234)">
+          <button onclick="exploreDsNode()">Explore Node</button>
+          <span class="mg-node-lbl" id="mg-node-lbl"></span>
+        </div>
+
+        <!-- D3 graph area -->
+        <div class="mg-graph-area" id="mg-graph-area">
+          <svg id="mg-svg"></svg>
+          <div class="mg-tip" id="mg-tip"></div>
+          <div class="mg-graph-loading" id="mg-loading">⟳ Loading graph…</div>
+        </div>
+
+        <!-- Legend + Kaggle link -->
+        <div class="mg-graph-legend" id="mg-legend" style="display:none">
+          <div class="mg-legend-items">
+            <div class="mg-legend-item"><span style="color:#ef4444;font-size:16px">●</span> Fraud</div>
+            <div class="mg-legend-item"><span style="color:#22c55e;font-size:16px">●</span> Legitimate</div>
+            <div class="mg-legend-item"><span style="color:#f59e0b;font-size:16px">●</span> Exploring</div>
+            <div class="mg-legend-item"><span style="color:#94a3b8;font-size:16px">●</span> Unknown</div>
+          </div>
+          <a class="mg-kaggle-link" id="mg-kaggle-link" href="#" target="_blank" rel="noopener">
+            🔗 Dataset on Kaggle →
+          </a>
+        </div>
+
+      </div><!-- /mg-graph-card -->
+
+      <!-- Node info panel (appears on click) -->
+      <div class="mg-node-panel" id="mg-node-panel">
+        <div class="mg-node-panel-title" id="mg-node-panel-title">Node Details</div>
+        <div class="mg-node-grid" id="mg-node-grid"></div>
+      </div>
+
+    </div><!-- /panel-compare -->
 
   </div>
 </div>
@@ -1029,10 +1277,316 @@ function pushFeed(id, sc) {
 
 // ── Tabs ──────────────────────────────────────────────────────
 function switchTab(t) {
-  document.getElementById('tab-graph').className = 'tab'+(t==='graph'?' active':'');
-  document.getElementById('tab-exp').className   = 'tab'+(t==='exp'  ?' active':'');
-  document.getElementById('panel-graph').style.display = t==='graph'?'block':'none';
-  document.getElementById('panel-exp').className  = 'exp-panel'+(t==='exp'?' show':'');
+  document.getElementById('tab-graph').className   = 'tab'+(t==='graph'  ?' active':'');
+  document.getElementById('tab-exp').className     = 'tab'+(t==='exp'    ?' active':'');
+  document.getElementById('tab-compare').className = 'tab'+(t==='compare'?' active':'');
+  document.getElementById('panel-graph').style.display = t==='graph' ? 'block' : 'none';
+  document.getElementById('panel-exp').className       = 'exp-panel'    +(t==='exp'     ?' show':'');
+  document.getElementById('panel-compare').className   = 'compare-panel'+(t==='compare' ?' show':'');
+  if (t==='compare' && !mgLoaded) initMultiGraph();
+}
+
+// ══════════════════════════════════════════════════════════════
+// MULTI-DATASET KNOWLEDGE GRAPHS
+// ══════════════════════════════════════════════════════════════
+let mgLoaded    = false;
+let mgActiveKey = null;
+let mgDatasets  = [];   // list of available trained dataset stats from API
+let mgSim       = null; // active D3 force simulation
+
+const ALL_DS_KEYS = ['elliptic','credit_card','paysim','insurance','ecommerce'];
+const DS_NAMES  = { elliptic:'Elliptic Bitcoin', credit_card:'Credit Card', paysim:'PaySim Payments', insurance:'Vehicle Insurance', ecommerce:'E-Commerce' };
+const DS_DOMAIN = { elliptic:'Blockchain / Crypto', credit_card:'Banking / Credit Card', paysim:'Mobile Payments / Fintech', insurance:'Vehicle Insurance Claims', ecommerce:'Online Retail' };
+const DS_ICON   = { elliptic:'₿', credit_card:'💳', paysim:'📱', insurance:'🚗', ecommerce:'🛒' };
+const DS_COLOR  = { elliptic:'#f97316', credit_card:'#1d4ed8', paysim:'#7c3aed', insurance:'#16a34a', ecommerce:'#dc2626' };
+const DS_KAGGLE = {
+  elliptic:    'https://www.kaggle.com/datasets/ellipticco/elliptic-data-set',
+  credit_card: 'https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud',
+  paysim:      'https://www.kaggle.com/datasets/rupakroy/online-payments-fraud-detection-dataset',
+  insurance:   'https://www.kaggle.com/datasets/shivamb/vehicle-claim-fraud-detection',
+  ecommerce:   'https://www.kaggle.com/datasets/shriyashjagtap/fraudulent-e-commerce-transactions',
+};
+
+// ── Init (called once when tab opens) ───────────────────────
+async function initMultiGraph() {
+  mgLoaded = true;
+  try {
+    mgDatasets = await fetch(`${API}/datasets`).then(r => r.json());
+  } catch(e) { mgDatasets = []; }
+
+  const trainedKeys = new Set(mgDatasets.map(d => d.key));
+
+  // Render dataset tabs for ALL 5 known datasets
+  document.getElementById('mg-tabs').innerHTML = ALL_DS_KEYS.map(key => {
+    const trained = trainedKeys.has(key);
+    const color   = DS_COLOR[key];
+    const style   = trained
+      ? `background:${color};color:#fff;border-color:${color}`
+      : 'opacity:0.65';
+    return `<div class="mg-tab" id="mgtab-${key}" onclick="switchDataset('${key}')" style="${style}">
+              ${DS_ICON[key]} ${DS_NAMES[key]}${trained?' ✓':''}
+            </div>`;
+  }).join('');
+
+  // Auto-select first trained dataset (or first key if none trained)
+  const firstKey = ALL_DS_KEYS.find(k => trainedKeys.has(k)) || ALL_DS_KEYS[0];
+  switchDataset(firstKey);
+}
+
+// ── Switch active dataset ─────────────────────────────────────
+async function switchDataset(key) {
+  if (mgSim) { mgSim.stop(); mgSim = null; }
+  mgActiveKey = key;
+
+  // Highlight active tab
+  ALL_DS_KEYS.forEach(k => {
+    const tab     = document.getElementById(`mgtab-${k}`);
+    if (!tab) return;
+    const trained = mgDatasets.some(d => d.key === k);
+    const color   = DS_COLOR[k];
+    if (k === key) {
+      tab.style.cssText = `background:${color};color:#fff;border-color:${color};transform:scale(1.05);font-weight:800`;
+    } else if (trained) {
+      tab.style.cssText = `background:${color}1a;color:${color};border-color:${color}66`;
+    } else {
+      tab.style.cssText = 'opacity:0.5';
+    }
+  });
+
+  document.getElementById('mg-ds-title').textContent  = DS_NAMES[key]  || key;
+  document.getElementById('mg-ds-domain').textContent = DS_DOMAIN[key] || '—';
+  document.getElementById('mg-kaggle-link').href      = DS_KAGGLE[key] || '#';
+
+  const stats = mgDatasets.find(d => d.key === key);
+  if (!stats) { showMgPending(key); return; }
+
+  // Update stats row
+  document.getElementById('mg-ds-stats').innerHTML = `
+    <div class="mg-ds-stat"><strong>${fmt(stats.num_nodes)}</strong>Nodes</div>
+    <div class="mg-ds-stat"><strong>${fmt(stats.num_edges)}</strong>Edges</div>
+    <div class="mg-ds-stat"><strong style="color:var(--red)">${stats.num_fraud.toLocaleString()}</strong>Fraud</div>
+    <div class="mg-ds-stat"><strong>${stats.fraud_rate}%</strong>Fraud Rate</div>
+    <div class="mg-ds-stat"><strong style="color:var(--muted);font-size:11px">${stats.directed?'Directed':'KNN'}</strong>Graph</div>`;
+
+  document.getElementById('mg-ctrl-row').style.display = 'flex';
+  document.getElementById('mg-legend').style.display   = 'flex';
+  document.getElementById('mg-node-input').value       = '';
+  hideMgNodePanel();
+  showMgLoading(true);
+
+  // Reset graph area (remove pending card if present)
+  const area = document.getElementById('mg-graph-area');
+  area.innerHTML = '<svg id="mg-svg"></svg><div class="mg-tip" id="mg-tip"></div>'
+                 + '<div class="mg-graph-loading" id="mg-loading" style="display:flex">⟳ Loading graph…</div>';
+
+  try {
+    const data = await fetch(`${API}/datasets/${key}/sample`).then(r => r.json());
+    document.getElementById('mg-node-lbl').textContent =
+      `Showing highest-fraud node #${data.target_node}  ·  ${data.nodes.length} nodes  ·  ${data.edges.length} edges`;
+    renderMgGraph(data.nodes, data.edges, data.target_node);
+  } catch(e) {
+    document.getElementById('mg-graph-area').innerHTML =
+      '<div style="height:460px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Could not load graph — is the API running?</div>';
+  } finally {
+    showMgLoading(false);
+  }
+}
+
+// ── Explore a specific node ───────────────────────────────────
+async function exploreDsNode() {
+  const key    = mgActiveKey;
+  const nodeId = parseInt(document.getElementById('mg-node-input').value);
+  if (!key || isNaN(nodeId)) return;
+  if (mgSim) { mgSim.stop(); mgSim = null; }
+
+  hideMgNodePanel();
+  showMgLoading(true);
+
+  // Rebuild graph area to get fresh SVG
+  const area = document.getElementById('mg-graph-area');
+  area.innerHTML = '<svg id="mg-svg"></svg><div class="mg-tip" id="mg-tip"></div>'
+                 + '<div class="mg-graph-loading" id="mg-loading" style="display:flex">⟳ Loading…</div>';
+
+  try {
+    const resp = await fetch(`${API}/datasets/${key}/subgraph`, {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify({ node_id: nodeId, k: 2, max_nodes: 40 }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json();
+      document.getElementById('mg-node-lbl').textContent = '⚠ ' + (err.detail || 'Error');
+      showMgLoading(false);
+      return;
+    }
+    const data = await resp.json();
+    document.getElementById('mg-node-lbl').textContent =
+      `Exploring node #${nodeId}  ·  ${data.nodes.length} nodes  ·  ${data.edges.length} edges`;
+    renderMgGraph(data.nodes, data.edges, nodeId);
+  } catch(e) {
+    document.getElementById('mg-node-lbl').textContent = '⚠ Network error';
+  } finally {
+    showMgLoading(false);
+  }
+}
+
+// ── Pending state ─────────────────────────────────────────────
+function showMgPending(key) {
+  document.getElementById('mg-ctrl-row').style.display = 'none';
+  document.getElementById('mg-legend').style.display   = 'none';
+  document.getElementById('mg-ds-stats').innerHTML     = '';
+  document.getElementById('mg-node-lbl').textContent   = '';
+  hideMgNodePanel();
+  document.getElementById('mg-graph-area').innerHTML = `
+    <div class="mg-pending-card">
+      <div class="mg-pending-icon">${DS_ICON[key]||'📊'}</div>
+      <h3>${DS_NAMES[key]||key} — Graph Not Yet Available</h3>
+      <p>Download the CSV from Kaggle, then run<br>
+         <code>notebooks/10_multi_dataset_comparison.ipynb</code><br>
+         The graph will appear here automatically.</p>
+      <a class="mg-kaggle-link" href="${DS_KAGGLE[key]||'#'}" target="_blank" rel="noopener">
+        🔗 Download from Kaggle →
+      </a>
+    </div>`;
+}
+
+function showMgLoading(on) {
+  const el = document.getElementById('mg-loading');
+  if (el) el.style.display = on ? 'flex' : 'none';
+}
+function hideMgNodePanel() {
+  const p = document.getElementById('mg-node-panel');
+  if (p) p.className = 'mg-node-panel';
+}
+
+// ── D3 force-directed graph (same style as main graph tab) ────
+function renderMgGraph(nodes, edges, targetNode) {
+  if (!nodes || !nodes.length) return;
+
+  const area = document.getElementById('mg-graph-area');
+  const W = area.clientWidth  || 760;
+  const H = area.clientHeight || 460;
+  const color = DS_COLOR[mgActiveKey] || '#2196F3';
+
+  const svgSel = d3.select('#mg-svg').attr('width', W).attr('height', H);
+  const tip    = d3.select('#mg-tip');
+
+  // Zoom layer
+  const g  = svgSel.append('g');
+  const zb = d3.zoom().scaleExtent([0.25, 5])
+    .on('zoom', e => g.attr('transform', e.transform));
+  svgSel.call(zb);
+
+  // Node colour
+  const nc = d => {
+    if (d.is_target)  return '#f59e0b';
+    if (d.label === 1) return '#ef4444';
+    if (d.label === 0) return '#22c55e';
+    return '#94a3b8';
+  };
+  const nr = d => d.is_target ? 14 : (d.label === 1 ? 10 : 8);
+
+  // Glow filter for target + fraud nodes
+  const defs = svgSel.append('defs');
+  const filt = defs.append('filter').attr('id', 'mg-glow');
+  filt.append('feGaussianBlur').attr('stdDeviation', 3).attr('result', 'blur');
+  const feMerge = filt.append('feMerge');
+  feMerge.append('feMergeNode').attr('in', 'blur');
+  feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+  // Force simulation
+  const sim = d3.forceSimulation(nodes)
+    .force('link',   d3.forceLink(edges).id(d => d.id).distance(65).strength(0.5))
+    .force('charge', d3.forceManyBody().strength(-220))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('coll',   d3.forceCollide(d => nr(d) + 4));
+  mgSim = sim;
+
+  // Dashed rings for fraud nodes
+  const rings = g.append('g').selectAll('circle')
+    .data(nodes.filter(d => d.label === 1 && !d.is_target)).join('circle')
+    .attr('r', d => nr(d) + 5).attr('fill', 'none')
+    .attr('stroke', '#ef4444').attr('stroke-width', 1.5)
+    .attr('stroke-dasharray', '4 3').attr('stroke-opacity', 0.55);
+
+  // Edges
+  const link = g.append('g').selectAll('line')
+    .data(edges).join('line')
+    .attr('stroke', '#cbd5e1').attr('stroke-width', 1.3).attr('stroke-opacity', 0.65);
+
+  // Nodes
+  const node = g.append('g').selectAll('circle')
+    .data(nodes).join('circle')
+    .attr('r',      d => nr(d))
+    .attr('fill',   d => nc(d))
+    .attr('stroke', '#ffffff').attr('stroke-width', 2)
+    .attr('filter', d => (d.is_target || d.label === 1) ? 'url(#mg-glow)' : null)
+    .style('cursor', 'pointer')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+      .on('drag',  (e, d) => { d.fx=e.x; d.fy=e.y; })
+      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
+    .on('mouseover', (e, d) => {
+      const v = d.label===1?'🔴 FRAUD':d.label===0?'🟢 LEGIT':'⚪ UNKNOWN';
+      const pct = (d.fraud_prob*100).toFixed(1);
+      tip.html(`<strong>Node #${d.id}</strong><br>${v}<br>Fraud prob: <strong>${pct}%</strong>`)
+         .style('left',(e.offsetX+14)+'px').style('top',(e.offsetY-8)+'px').style('opacity',1);
+    })
+    .on('mouseout', () => tip.style('opacity', 0))
+    .on('click', (e, d) => { e.stopPropagation(); onMgNodeClick(d); });
+
+  // Label for target node only
+  const lbl = g.append('g').selectAll('text')
+    .data(nodes.filter(d => d.is_target)).join('text')
+    .attr('text-anchor','middle').attr('dy',-18)
+    .attr('font-size',10).attr('font-weight',800).attr('fill','#f59e0b')
+    .text(d => `▶ #${d.id}`);
+
+  // Tick
+  sim.on('tick', () => {
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
+        .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    node.attr('cx',d=>d.x).attr('cy',d=>d.y);
+    rings.attr('cx',d=>d.x).attr('cy',d=>d.y);
+    lbl.attr('x',d=>d.x).attr('y',d=>d.y);
+  });
+
+  // Click on SVG background → hide node panel
+  svgSel.on('click', () => hideMgNodePanel());
+}
+
+// ── Node click → info panel ───────────────────────────────────
+function onMgNodeClick(d) {
+  const verdict = d.label===1 ? '🔴 ILLICIT' : d.label===0 ? '🟢 LICIT' : '⚪ UNKNOWN';
+  const col     = d.label===1 ? 'var(--red)'  : d.label===0 ? 'var(--green)' : 'var(--muted)';
+  const pct     = (d.fraud_prob * 100).toFixed(1);
+
+  document.getElementById('mg-node-panel-title').textContent = `Node #${d.id}  ·  ${DS_NAMES[mgActiveKey]||mgActiveKey}`;
+  document.getElementById('mg-node-grid').innerHTML = `
+    <div class="mg-node-tile">
+      <div class="val" style="color:${col}">${verdict}</div>
+      <div class="lbl">Verdict</div>
+    </div>
+    <div class="mg-node-tile">
+      <div class="val" style="color:${col}">${pct}%</div>
+      <div class="lbl">Fraud Probability</div>
+    </div>
+    <div class="mg-node-tile">
+      <div class="val">#${d.id.toLocaleString()}</div>
+      <div class="lbl">Node ID</div>
+    </div>
+    <div class="mg-node-tile">
+      <div class="val">${DS_DOMAIN[mgActiveKey]||'—'}</div>
+      <div class="lbl">Domain</div>
+    </div>
+    <div class="mg-node-tile">
+      <button style="width:100%;padding:7px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer"
+              onclick="document.getElementById('mg-node-input').value=${d.id};exploreDsNode()">
+        🔍 Explore this node
+      </button>
+      <div class="lbl" style="margin-top:3px">Get 2-hop subgraph</div>
+    </div>`;
+  document.getElementById('mg-node-panel').className = 'mg-node-panel show';
 }
 
 // ── Legend toggle ─────────────────────────────────────────────

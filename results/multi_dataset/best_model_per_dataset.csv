@@ -1,0 +1,6 @@
+Dataset,Best_by_F1,F1,Best_by_ROCAUC,ROC_AUC,Best_by_PRAUC,PR_AUC
+Elliptic Bitcoin,GraphSAGE,0.6942,GraphSAGE,0.9727,GraphSAGE,0.8787
+Credit Card,GraphSAGE,0.6159,GraphSAGE,0.9784,GraphSAGE,0.8724
+PaySim Payments,GraphSAGE,0.7411,GraphSAGE,0.9294,GraphSAGE,0.8495
+Vehicle Insurance,GraphSAGE,0.2271,GraphSAGE,0.8212,GraphSAGE,0.1939
+E-Commerce,GraphSAGE,0.4988,GraphSAGE,0.7796,GraphSAGE,0.5777
