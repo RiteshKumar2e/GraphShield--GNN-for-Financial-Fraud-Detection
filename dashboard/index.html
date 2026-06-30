@@ -1480,100 +1480,162 @@ function hideMgNodePanel() {
   if (p) p.className = 'mg-node-panel';
 }
 
-// ── D3 force-directed graph (same style as main graph tab) ────
+// ── D3 force-directed graph — same rich style as main Elliptic tab ────
 function renderMgGraph(nodes, edges, targetNode) {
   if (!nodes || !nodes.length) return;
 
   const area = document.getElementById('mg-graph-area');
   const W = area.clientWidth  || 760;
   const H = area.clientHeight || 460;
-  const color = DS_COLOR[mgActiveKey] || '#2196F3';
 
-  const svgSel = d3.select('#mg-svg').attr('width', W).attr('height', H);
-  const tip    = d3.select('#mg-tip');
+  const svg  = d3.select('#mg-svg').attr('width', W).attr('height', H);
+  const mgTip = d3.select('#mg-tip');
 
   // Zoom layer
-  const g  = svgSel.append('g');
-  const zb = d3.zoom().scaleExtent([0.25, 5])
-    .on('zoom', e => g.attr('transform', e.transform));
-  svgSel.call(zb);
+  const zoom = d3.zoom().scaleExtent([0.2, 6])
+    .on('zoom', e => root.attr('transform', e.transform));
+  svg.call(zoom);
+  const root = svg.append('g');
 
-  // Node colour
-  const nc = d => {
-    if (d.is_target)  return '#f59e0b';
-    if (d.label === 1) return '#ef4444';
-    if (d.label === 0) return '#22c55e';
-    return '#94a3b8';
+  // Node colour & radius — identical to main tab
+  const nC = d => d.is_target ? '#3b82f6' : d.label===1 ? '#ef4444' : '#22c55e';
+  const nR = d => d.is_target ? 28 : d.label===1 ? 22 : 20;
+
+  // ── Defs: glows + arrow markers ──
+  const defs = svg.append('defs');
+
+  const mkGlow = (id, col, std) => {
+    const f = defs.append('filter').attr('id', id).attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+    f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation', std).attr('result','blur');
+    const m = f.append('feMerge');
+    m.append('feMergeNode').attr('in','blur');
+    m.append('feMergeNode').attr('in','SourceGraphic');
   };
-  const nr = d => d.is_target ? 14 : (d.label === 1 ? 10 : 8);
+  mkGlow('mg-gl-blue',  '#3b82f6', 6);
+  mkGlow('mg-gl-red',   '#ef4444', 4);
+  mkGlow('mg-gl-green', '#22c55e', 3);
 
-  // Glow filter for target + fraud nodes
-  const defs = svgSel.append('defs');
-  const filt = defs.append('filter').attr('id', 'mg-glow');
-  filt.append('feGaussianBlur').attr('stdDeviation', 3).attr('result', 'blur');
-  const feMerge = filt.append('feMerge');
-  feMerge.append('feMergeNode').attr('in', 'blur');
-  feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+  const mkArrow = (id, col) => {
+    defs.append('marker').attr('id',id).attr('viewBox','0 -4 8 8').attr('refX',8).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto')
+      .append('path').attr('d','M0,-4L8,0L0,4').attr('fill',col);
+  };
+  const directed = mgDatasets.find(d => d.key === mgActiveKey)?.directed || false;
+  if (directed) {
+    mkArrow('mg-arr',      '#94a3b8');
+    mkArrow('mg-arr-red',  '#ef4444');
+    mkArrow('mg-arr-blue', '#3b82f6');
+  }
 
-  // Force simulation
+  // ── Force simulation ──
   const sim = d3.forceSimulation(nodes)
-    .force('link',   d3.forceLink(edges).id(d => d.id).distance(65).strength(0.5))
-    .force('charge', d3.forceManyBody().strength(-220))
-    .force('center', d3.forceCenter(W / 2, H / 2))
-    .force('coll',   d3.forceCollide(d => nr(d) + 4));
+    .force('link',   d3.forceLink(edges).id(d => d.id).distance(80).strength(0.45))
+    .force('charge', d3.forceManyBody().strength(-280))
+    .force('center', d3.forceCenter(W/2, H/2))
+    .force('coll',   d3.forceCollide(d => nR(d) + 8));
   mgSim = sim;
 
-  // Dashed rings for fraud nodes
-  const rings = g.append('g').selectAll('circle')
-    .data(nodes.filter(d => d.label === 1 && !d.is_target)).join('circle')
-    .attr('r', d => nr(d) + 5).attr('fill', 'none')
-    .attr('stroke', '#ef4444').attr('stroke-width', 1.5)
-    .attr('stroke-dasharray', '4 3').attr('stroke-opacity', 0.55);
-
-  // Edges
-  const link = g.append('g').selectAll('line')
-    .data(edges).join('line')
-    .attr('stroke', '#cbd5e1').attr('stroke-width', 1.3).attr('stroke-opacity', 0.65);
-
-  // Nodes
-  const node = g.append('g').selectAll('circle')
-    .data(nodes).join('circle')
-    .attr('r',      d => nr(d))
-    .attr('fill',   d => nc(d))
-    .attr('stroke', '#ffffff').attr('stroke-width', 2)
-    .attr('filter', d => (d.is_target || d.label === 1) ? 'url(#mg-glow)' : null)
-    .style('cursor', 'pointer')
-    .call(d3.drag()
-      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
-      .on('drag',  (e, d) => { d.fx=e.x; d.fy=e.y; })
-      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }))
-    .on('mouseover', (e, d) => {
-      const v = d.label===1?'🔴 FRAUD':d.label===0?'🟢 LEGIT':'⚪ UNKNOWN';
-      const pct = (d.fraud_prob*100).toFixed(1);
-      tip.html(`<strong>Node #${d.id}</strong><br>${v}<br>Fraud prob: <strong>${pct}%</strong>`)
-         .style('left',(e.offsetX+14)+'px').style('top',(e.offsetY-8)+'px').style('opacity',1);
+  // ── Edges ──
+  const link = root.append('g').selectAll('line').data(edges).join('line')
+    .attr('stroke', d => {
+      const sn = nodes.find(n => n.id === (typeof d.source==='object'?d.source.id:d.source));
+      const tn = nodes.find(n => n.id === (typeof d.target==='object'?d.target.id:d.target));
+      if (sn&&sn.is_target||tn&&tn.is_target) return '#3b82f6';
+      if (sn&&sn.label===1||tn&&tn.label===1) return '#ef4444';
+      return '#cbd5e1';
     })
-    .on('mouseout', () => tip.style('opacity', 0))
-    .on('click', (e, d) => { e.stopPropagation(); onMgNodeClick(d); });
+    .attr('stroke-width', 1.6)
+    .attr('stroke-opacity', 0.65)
+    .attr('marker-end', d => {
+      if (!directed) return null;
+      const sn = nodes.find(n => n.id === (typeof d.source==='object'?d.source.id:d.source));
+      const tn = nodes.find(n => n.id === (typeof d.target==='object'?d.target.id:d.target));
+      if (sn&&sn.is_target||tn&&tn.is_target) return 'url(#mg-arr-blue)';
+      if (sn&&sn.label===1||tn&&tn.label===1) return 'url(#mg-arr-red)';
+      return 'url(#mg-arr)';
+    });
 
-  // Label for target node only
-  const lbl = g.append('g').selectAll('text')
-    .data(nodes.filter(d => d.is_target)).join('text')
-    .attr('text-anchor','middle').attr('dy',-18)
-    .attr('font-size',10).attr('font-weight',800).attr('fill','#f59e0b')
-    .text(d => `▶ #${d.id}`);
+  // ── Node groups ──
+  const nodeEl = root.append('g').selectAll('g').data(nodes).join('g')
+    .style('cursor','pointer')
+    .call(d3.drag()
+      .on('start',(e,d)=>{ if(!e.active)sim.alphaTarget(0.3).restart(); d.fx=d.x;d.fy=d.y; })
+      .on('drag', (e,d)=>{ d.fx=e.x;d.fy=e.y; })
+      .on('end',  (e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null;d.fy=null; }))
+    .on('mouseover',(e,d)=>{
+      const v = d.is_target?'🔵 TARGET':d.label===1?'🔴 FRAUD':'🟢 LEGIT';
+      const pct = (d.fraud_prob*100).toFixed(1);
+      mgTip.html(`<strong>Node #${d.id}</strong><br>${v}<br>Fraud prob: <strong>${pct}%</strong>`)
+        .style('left',(e.offsetX+14)+'px').style('top',(e.offsetY-8)+'px').style('opacity',1);
+    })
+    .on('mouseout',()=>mgTip.style('opacity',0))
+    .on('click',(e,d)=>{ e.stopPropagation(); onMgNodeClick(d); });
 
-  // Tick
-  sim.on('tick', () => {
+  // soft glow halo
+  nodeEl.append('circle')
+    .attr('r', d=>nR(d)+12).attr('fill', nC).attr('fill-opacity',.12).attr('stroke','none');
+
+  // main filled circle
+  nodeEl.append('circle')
+    .attr('r', nR).attr('fill', nC)
+    .attr('stroke', d=>d.is_target?'#ffffff':d.label===1?'#fca5a5':'#86efac')
+    .attr('stroke-width', d=>d.is_target?4:2)
+    .attr('filter', d=>d.is_target?'url(#mg-gl-blue)':d.label===1?'url(#mg-gl-red)':'url(#mg-gl-green)');
+
+  // fraud probability arc ring (target + fraud nodes)
+  nodeEl.filter(d=>d.label===1||d.is_target).append('circle')
+    .attr('r', d=>nR(d)+6).attr('fill','none')
+    .attr('stroke', d=>d.is_target?'#3b82f6':'#ef4444')
+    .attr('stroke-width',3)
+    .attr('stroke-dasharray', d=>{ const c=2*Math.PI*(nR(d)+6); return `${c*d.fraud_prob} ${c*(1-d.fraud_prob)}`; })
+    .attr('stroke-linecap','round').attr('transform','rotate(-90)');
+
+  // type label (top line inside circle)
+  nodeEl.append('text')
+    .attr('text-anchor','middle').attr('y',-7)
+    .attr('font-family',"'Segoe UI',Arial,sans-serif")
+    .attr('font-size', d=>d.is_target?9:7)
+    .attr('font-weight','700').attr('letter-spacing','.5')
+    .attr('fill','rgba(255,255,255,.85)').attr('pointer-events','none')
+    .text(d=>d.is_target?'TARGET':d.label===1?'FRAUD':'LICIT');
+
+  // node ID (bottom line inside circle)
+  nodeEl.append('text')
+    .attr('text-anchor','middle').attr('y',8)
+    .attr('font-family',"'Segoe UI',Arial,sans-serif")
+    .attr('font-size', d=>d.is_target?15:11)
+    .attr('font-weight','800')
+    .attr('fill','#ffffff').attr('pointer-events','none')
+    .text(d=>d.id);
+
+  // fraud % below circle (target + fraud)
+  nodeEl.filter(d=>d.label===1||d.is_target).append('text')
+    .attr('text-anchor','middle')
+    .attr('dy', d=>nR(d)+20)
+    .attr('font-size',10).attr('font-weight','700')
+    .attr('fill', d=>d.is_target?'#1d4ed8':'#dc2626')
+    .attr('pointer-events','none')
+    .text(d=>(d.fraud_prob*100).toFixed(0)+'%');
+
+  // ── Tick ──
+  sim.on('tick',()=>{
     link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
         .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
-    node.attr('cx',d=>d.x).attr('cy',d=>d.y);
-    rings.attr('cx',d=>d.x).attr('cy',d=>d.y);
-    lbl.attr('x',d=>d.x).attr('y',d=>d.y);
+    nodeEl.attr('transform',d=>`translate(${d.x},${d.y})`);
   });
 
-  // Click on SVG background → hide node panel
-  svgSel.on('click', () => hideMgNodePanel());
+  // zoom-to-fit after simulation settles
+  setTimeout(()=>{
+    const b = root.node().getBBox();
+    if (b.width > 10) {
+      const pad=60, sc=Math.min((W-pad*2)/b.width,(H-pad*2)/b.height,1.4);
+      const tx=W/2-sc*(b.x+b.width/2), ty=H/2-sc*(b.y+b.height/2);
+      svg.transition().duration(600).ease(d3.easeCubicOut)
+        .call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(sc));
+    }
+  }, 1400);
+
+  // click SVG background → hide node panel
+  svg.on('click', ()=>hideMgNodePanel());
 }
 
 // ── Node click → info panel ───────────────────────────────────
