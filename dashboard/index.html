@@ -697,6 +697,163 @@ footer a:hover { text-decoration: underline; }
 
 /* ── Feed time badge ─────────────────────────────────────────── */
 .feed-time { font-size: 10px; color: var(--muted); font-family: monospace; }
+
+/* ══════════════════════════════════════════════════════════════
+   NEO4J KNOWLEDGE GRAPH THEME — LIGHT
+   ══════════════════════════════════════════════════════════════ */
+
+/* Light canvas */
+.graph-wrap  { background: #eef2f8 !important; }
+#graph-svg   { background: radial-gradient(ellipse at 50% 40%, #e8eef8 0%, #dde5f2 100%) !important; }
+.mg-graph-area { background: linear-gradient(135deg, #edf2fb 0%, #e2eaf6 100%) !important; }
+
+/* Ctrl-row and legend strip — light */
+.mg-ctrl-row {
+  background: var(--surface) !important;
+  border-bottom: 1.5px solid var(--border) !important;
+}
+.mg-ctrl-row input {
+  background: var(--surface2) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+.mg-ctrl-row input:focus { border-color: var(--blue-mid) !important; }
+.mg-ctrl-row input::placeholder { color: var(--muted) !important; }
+.mg-ctrl-row button {
+  background: linear-gradient(135deg, var(--blue), #3b82f6) !important;
+  box-shadow: 0 2px 6px rgba(29,78,216,.2) !important;
+}
+.mg-ctrl-row .mg-node-lbl { color: var(--muted) !important; }
+.mg-graph-legend {
+  background: var(--surface) !important;
+  border-top: 1.5px solid var(--border) !important;
+  color: var(--muted) !important;
+}
+.mg-kaggle-link { border-color: var(--blue-mid) !important; color: var(--blue) !important; }
+.mg-kaggle-link:hover { background: var(--blue-lt) !important; }
+.mg-graph-loading {
+  background: rgba(237,242,251,.9) !important;
+  color: var(--muted) !important;
+  font-size: 13px; gap: 10px;
+}
+.mg-pending-card { background: #f8faff !important; color: var(--muted) !important; }
+.mg-pending-card h3 { color: var(--text) !important; }
+.mg-pending-card p  { color: var(--muted) !important; }
+.mg-pending-card code { background: var(--surface2) !important; color: var(--text2) !important; }
+
+/* Neo4j Cypher caption bar — light */
+.neo4j-cypher-bar {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,.94); border: 1px solid rgba(29,78,216,.18);
+  border-radius: 8px; padding: 7px 16px; font-size: 11px;
+  font-family: 'Consolas','Monaco',monospace;
+  color: #374151; max-width: 76%;
+  backdrop-filter: blur(10px); z-index: 15;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 4px 20px rgba(29,78,216,.1), 0 1px 4px rgba(0,0,0,.06);
+  pointer-events: none; display: none;
+}
+.neo4j-cypher-bar.show { display: block; }
+.neo4j-cypher-bar .kw   { color: #7c3aed; font-weight: 700; }
+.neo4j-cypher-bar .nd   { color: #059669; }
+.neo4j-cypher-bar .rel  { color: #d97706; }
+.neo4j-cypher-bar .prop { color: #1d4ed8; }
+.neo4j-cypher-bar .num  { color: #c2410c; }
+
+/* Neo4j legend — light, floating */
+.neo4j-legend {
+  position: absolute; bottom: 14px; left: 14px;
+  background: rgba(255,255,255,.96); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  box-shadow: var(--shadow-lg); min-width: 208px;
+  backdrop-filter: blur(12px); display: none; z-index: 12;
+}
+.neo4j-legend.show { display: block; }
+.neo4j-legend-title {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.2px; color: var(--muted); margin-bottom: 12px;
+}
+.neo4j-legend-node { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.neo4j-legend-circle {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: #fff;
+}
+.neo4j-legend-info .lbl { font-size: 12px; font-weight: 700; color: var(--text); font-family: monospace; }
+.neo4j-legend-info .sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.neo4j-legend-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.neo4j-legend-rel { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+.neo4j-legend-relline {
+  width: 32px; height: 1.5px; border-radius: 1px; flex-shrink: 0;
+  position: relative;
+}
+.neo4j-legend-hint { font-size: 10px; color: var(--muted); line-height: 1.55; margin-top: 8px; }
+
+/* Neo4j properties panel — light */
+.neo4j-props {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 224px; background: rgba(255,255,255,.98);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; box-shadow: var(--shadow-lg);
+  display: none; backdrop-filter: blur(14px); z-index: 20;
+}
+.neo4j-props.show { display: block; }
+.neo4j-props-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.neo4j-props-title { font-size: 13px; font-weight: 800; color: var(--text); }
+.neo4j-props-close {
+  width: 22px; height: 22px; background: var(--surface2);
+  border: none; border-radius: 50%; color: var(--muted);
+  cursor: pointer; font-size: 15px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.neo4j-props-close:hover { background: var(--border); color: var(--text); }
+.neo4j-type-badge {
+  display: inline-block; padding: 3px 11px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; margin-bottom: 13px; font-family: monospace;
+}
+.neo4j-prop-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 5px 0; border-bottom: 1px solid var(--border); gap: 10px;
+}
+.neo4j-prop-row:last-child { border-bottom: none; }
+.neo4j-prop-key { font-size: 10px; color: var(--muted); font-family: monospace; flex-shrink: 0; }
+.neo4j-prop-val { font-size: 11px; color: var(--text); font-weight: 600; font-family: monospace; text-align: right; }
+
+/* Edge labels — dark text on light canvas */
+text.edge-lbl {
+  font-size: 9px; fill: #64748b; font-family: monospace;
+  text-transform: uppercase; letter-spacing: .4px; pointer-events: none;
+  paint-order: stroke fill; stroke: rgba(237,242,251,.9); stroke-width: 4px;
+}
+
+/* Zoom controls — light */
+.z-btn {
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text2) !important;
+}
+.z-btn:hover { background: var(--surface2) !important; color: var(--text) !important; }
+
+/* Graph badge — light */
+.graph-badge {
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text2) !important;
+}
+
+/* Tooltip — light (revert to default) */
+.tip {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+}
+.tip-title { color: var(--text) !important; }
+.tip-row   { color: var(--muted) !important; }
+.tip-row span:last-child { color: var(--text) !important; }
+.tip-hint  { color: var(--blue) !important; border-color: var(--border) !important; }
+.mg-tip {
+  background: var(--surface) !important; color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+}
 </style>
 </head>
 <body>
@@ -831,6 +988,18 @@ footer a:hover { text-decoration: underline; }
     <div class="graph-wrap" id="panel-graph">
       <svg id="graph-svg"></svg>
 
+      <!-- Neo4j Cypher bar -->
+      <div class="neo4j-cypher-bar" id="main-cypher"></div>
+
+      <!-- Neo4j Properties panel -->
+      <div class="neo4j-props" id="main-neo4j-props">
+        <div class="neo4j-props-hdr">
+          <div class="neo4j-props-title">Node Properties</div>
+          <button class="neo4j-props-close" onclick="document.getElementById('main-neo4j-props').classList.remove('show')">×</button>
+        </div>
+        <div id="main-props-body"></div>
+      </div>
+
       <!-- Empty state -->
       <div class="empty" id="empty">
         <div class="empty-icon">🛡️</div>
@@ -849,60 +1018,47 @@ footer a:hover { text-decoration: underline; }
         <span class="badge-dot" style="background:var(--green)"></span><span id="badge-licit">0 Licit</span>
       </div>
 
-      <!-- Legend -->
-      <div class="legend-card" id="legend">
+      <!-- Neo4j Legend (dark) -->
+      <div class="neo4j-legend" id="neo4j-legend">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="legend-title" style="margin-bottom:0">What this graph shows</div>
+          <div class="neo4j-legend-title">Knowledge Graph Legend</div>
           <button onclick="toggleLegend()" id="legend-toggle"
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;
-                   padding:2px 8px;font-size:11px;cursor:pointer;color:var(--muted);font-weight:600">
-            Hide
-          </button>
+            style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+                   border-radius:5px;padding:2px 8px;font-size:10px;cursor:pointer;
+                   color:rgba(255,255,255,.5);font-weight:600">Hide</button>
         </div>
-
-        <div class="legend-item">
-          <div class="legend-circle" style="background:var(--blue);box-shadow:0 0 0 3px #bfdbfe">T</div>
-          <div class="legend-text">
-            <strong>Target Node (Inspected)</strong>
-            <span>The transaction you searched for. Its fraud probability is shown as a coloured ring.</span>
+        <div class="neo4j-legend-node">
+          <div class="neo4j-legend-circle" style="background:#2563eb;border:2.5px solid #93c5fd">T</div>
+          <div class="neo4j-legend-info">
+            <div class="lbl">:Transaction</div>
+            <div class="sub">Target node · being inspected</div>
           </div>
         </div>
-
-        <div class="legend-item">
-          <div class="legend-circle" style="background:var(--red)">!</div>
-          <div class="legend-text">
-            <strong>Illicit Transaction</strong>
-            <span>Known fraudulent node. Red edges = money flows to/from illicit nodes.</span>
+        <div class="neo4j-legend-node">
+          <div class="neo4j-legend-circle" style="background:#dc2626;border:2.5px solid #fca5a5">!</div>
+          <div class="neo4j-legend-info">
+            <div class="lbl">:Illicit</div>
+            <div class="sub">Confirmed fraud transaction</div>
           </div>
         </div>
-
-        <div class="legend-item">
-          <div class="legend-circle" style="background:var(--green)">✓</div>
-          <div class="legend-text">
-            <strong>Licit Transaction</strong>
-            <span>Verified clean transaction. Grey edges = normal money flows.</span>
+        <div class="neo4j-legend-node" style="margin-bottom:0">
+          <div class="neo4j-legend-circle" style="background:#16a34a;border:2.5px solid #86efac">✓</div>
+          <div class="neo4j-legend-info">
+            <div class="lbl">:Licit</div>
+            <div class="sub">Verified clean transaction</div>
           </div>
         </div>
-
-        <hr class="legend-divider"/>
-
-        <div class="legend-item" style="margin-bottom:4px">
-          <svg width="36" height="14" style="flex-shrink:0">
-            <circle cx="7" cy="7" r="6" fill="none" stroke="var(--red)" stroke-width="2"
-              stroke-dasharray="26 13" transform="rotate(-90 7 7)"/>
-            <circle cx="29" cy="7" r="6" fill="none" stroke="var(--blue)" stroke-width="2"
-              stroke-dasharray="39 0" transform="rotate(-90 29 7)"/>
-          </svg>
-          <div class="legend-text">
-            <strong>Probability Arc</strong>
-            <span>The outer ring shows fraud probability. Full ring = 100% fraud.</span>
-          </div>
+        <hr class="neo4j-legend-divider"/>
+        <div class="neo4j-legend-rel">
+          <div class="neo4j-legend-relline" style="background:#94a3b8"></div>
+          <span style="font-size:11px;font-family:monospace;color:var(--muted)">[:SENDS_TO]</span>
         </div>
-
-        <hr class="legend-divider"/>
-        <div class="legend-hint">
-          <strong>Drag</strong> nodes to rearrange · <strong>Scroll</strong> to zoom ·
-          <strong>Click</strong> any node to inspect it
+        <div class="neo4j-legend-rel">
+          <div class="neo4j-legend-relline" style="background:#dc2626"></div>
+          <span style="font-size:11px;font-family:monospace;color:var(--muted)">[:SENDS_TO] fraud path</span>
+        </div>
+        <div class="neo4j-legend-hint">
+          <strong style="color:var(--text2)">Drag</strong> · <strong style="color:var(--text2)">Scroll</strong> zoom · <strong style="color:var(--text2)">Click</strong> node for properties
         </div>
       </div>
 
@@ -1008,6 +1164,28 @@ const API = '/api/v1';
 let svg, zoom, sim;
 let feed = [];
 
+// ── Neo4j Knowledge Graph constants ─────────────────────────
+const KG_NODE_TYPES = {
+  elliptic:    { target:'Transaction', fraud:'Illicit',    legit:'Licit'      },
+  credit_card: { target:'Transaction', fraud:'Fraud',      legit:'Legit'      },
+  paysim:      { target:'Payment',     fraud:'Fraud',      legit:'Legit'      },
+  insurance:   { target:'Claim',       fraud:'Fraudulent', legit:'Legitimate' },
+  ecommerce:   { target:'Order',       fraud:'Fraud',      legit:'Legit'      },
+};
+const KG_REL_TYPES = {
+  elliptic:    'SENDS_TO',
+  credit_card: 'SIMILAR_TO',
+  paysim:      'TRANSFERS_TO',
+  insurance:   'SIMILAR_TO',
+  ecommerce:   'SIMILAR_TO',
+};
+function neoColor(d) {
+  if (d.is_target) return { fill:'#2563eb', stroke:'#93c5fd' };
+  if (d.label===1) return { fill:'#dc2626', stroke:'#fca5a5' };
+  if (d.label===0) return { fill:'#16a34a', stroke:'#86efac' };
+  return { fill:'#6b7280', stroke:'#d1d5db' };
+}
+
 // ── Boot ──────────────────────────────────────────────────────
 async function boot() {
   initSvg();
@@ -1108,14 +1286,7 @@ function renderInfoBar(sc, ex) {
   );
 }
 
-// ── D3 graph ──────────────────────────────────────────────────
-function nR(d) { return d.is_target?40:d.label===1?28:22; }
-function nC(d) {
-  if(d.is_target) return '#1d4ed8';
-  if(d.label===1)  return '#dc2626';
-  return '#16a34a';
-}
-
+// ── D3 init ──────────────────────────────────────────────────
 function initSvg() {
   svg  = d3.select('#graph-svg');
   zoom = d3.zoom().scaleExtent([.1,6]).on('zoom', e => svg.select('g.root').attr('transform', e.transform));
@@ -1123,18 +1294,25 @@ function initSvg() {
   svg.append('g').attr('class','root');
 }
 
+// ── Main Graph (Neo4j style) ──────────────────────────────────
 function renderGraph(targetId, ex, sc) {
   document.getElementById('empty').classList.add('hidden');
-  document.getElementById('legend').classList.add('show');
+  document.getElementById('neo4j-legend').classList.add('show');
   document.getElementById('graph-badge').classList.add('show');
 
-  const nodes = ex.explanation_nodes||[];
-  const edges = ex.explanation_edges||[];
-
+  const nodes = ex.explanation_nodes || [];
+  const edges = ex.explanation_edges || [];
   const nIll  = nodes.filter(n=>n.label===1&&!n.is_target).length;
   const nLic  = nodes.filter(n=>n.label===0).length;
   set('badge-illicit', nIll+' Illicit');
   set('badge-licit',   nLic+' Licit');
+
+  // Cypher caption
+  const cb = document.getElementById('main-cypher');
+  if(cb){ cb.className='neo4j-cypher-bar show';
+    cb.innerHTML=`<span class="kw">MATCH</span> <span class="nd">(t:Transaction {id: <span class="num">${targetId}</span>})</span>`+
+    `-[<span class="rel">r:SENDS_TO*1..2</span>]-`+
+    `<span class="nd">(n)</span> <span class="kw">RETURN</span> <span class="prop">t,r,n</span> <span class="kw">LIMIT</span> <span class="num">${nodes.length}</span>`; }
 
   if(!nodes.length) return;
 
@@ -1146,144 +1324,142 @@ function renderGraph(targetId, ex, sc) {
 
   // ── Defs ──
   const defs = svg.append('defs');
-  const mkArrow = (id, color) => defs.append('marker')
-    .attr('id',id).attr('viewBox','0 -5 10 10')
-    .attr('refX',32).attr('refY',0)
-    .attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
-    .append('path').attr('d','M0,-5L10,0L0,5').attr('fill',color);
-  mkArrow('arr',     '#9eaab8');
-  mkArrow('arr-red', '#dc2626');
-  mkArrow('arr-blue','#1d4ed8');
-
-  const mkGlow = (id, color) => {
-    const f = defs.append('filter').attr('id',id)
-      .attr('x','-60%').attr('y','-60%').attr('width','220%').attr('height','220%');
-    f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation',6).attr('result','b');
-    const m = f.append('feMerge');
-    m.append('feMergeNode').attr('in','b');
-    m.append('feMergeNode').attr('in','SourceGraphic');
-  };
-  mkGlow('gl-blue','#1d4ed8');
-  mkGlow('gl-red','#dc2626');
-  mkGlow('gl-green','#16a34a');
+  // drop shadow
+  const sf = defs.append('filter').attr('id','ns').attr('x','-40%').attr('y','-40%').attr('width','180%').attr('height','180%');
+  sf.append('feDropShadow').attr('dx',0).attr('dy',3).attr('stdDeviation',6).attr('flood-color','rgba(0,0,0,.18)').attr('result','d');
+  const sm=sf.append('feMerge'); sm.append('feMergeNode').attr('in','d'); sm.append('feMergeNode').attr('in','SourceGraphic');
+  // arrows
+  const mkA=(id,col)=>defs.append('marker').attr('id',id).attr('viewBox','0 -4 10 8')
+    .attr('refX',10).attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
+    .append('path').attr('d','M0,-4L10,0L0,4').attr('fill',col);
+  mkA('an',  '#94a3b8'); mkA('an-r','#dc2626'); mkA('an-b','#2563eb');
 
   // ── Sim data ──
-  const sim_nodes = nodes.map(n=>({...n}));
-  const idxMap = {}; sim_nodes.forEach((n,i)=>{ idxMap[n.id]=i; });
-  const sim_links = edges
-    .map(e=>({source:idxMap[e.source],target:idxMap[e.target],weight:e.weight}))
-    .filter(l=>l.source!==undefined&&l.target!==undefined);
+  const sn=[]; nodes.forEach(n=>sn.push({...n}));
+  const idx={}; sn.forEach((n,i)=>{ idx[n.id]=i; });
+  const sl=edges.map(e=>({source:idx[e.source],target:idx[e.target],weight:e.weight||0}))
+                .filter(l=>l.source!==undefined&&l.target!==undefined);
+
+  const nRadius = d=>d.is_target?38:d.label===1?28:24;
 
   if(sim) sim.stop();
-  sim = d3.forceSimulation(sim_nodes)
-    .force('link',      d3.forceLink(sim_links).id((_,i)=>i).distance(120).strength(.5))
-    .force('charge',    d3.forceManyBody().strength(-700))
-    .force('center',    d3.forceCenter(W/2, H/2))
-    .force('collision', d3.forceCollide(d=>nR(d)+18))
+  sim = d3.forceSimulation(sn)
+    .force('link',      d3.forceLink(sl).id((_,i)=>i).distance(130).strength(.45))
+    .force('charge',    d3.forceManyBody().strength(-900))
+    .force('center',    d3.forceCenter(W/2,H/2))
+    .force('collision', d3.forceCollide(d=>nRadius(d)+22))
     .alphaDecay(.02);
 
   // ── Edges ──
   const linkG = root.append('g');
-  const link  = linkG.selectAll('line').data(sim_links).join('line')
-    .attr('stroke', d => {
-      const s = sim_nodes[typeof d.source==='object'?d.source.index:d.source];
-      const t = sim_nodes[typeof d.target==='object'?d.target.index:d.target];
-      if(s&&s.is_target||t&&t.is_target) return '#1d4ed8';
-      if((s&&s.label===1)||(t&&t.label===1)) return '#dc2626';
-      return '#9eaab8';
+  const link  = linkG.selectAll('line').data(sl).join('line')
+    .attr('stroke', d=>{
+      const s=sn[typeof d.source==='object'?d.source.index:d.source];
+      const t=sn[typeof d.target==='object'?d.target.index:d.target];
+      if(s&&s.is_target||t&&t.is_target) return '#2563eb';
+      if(s&&s.label===1||t&&t.label===1) return '#dc2626';
+      return '#94a3b8';
     })
-    .attr('stroke-width', d => 1.5 + d.weight*2.5)
-    .attr('stroke-opacity', .7)
-    .attr('marker-end', d => {
-      const s = sim_nodes[typeof d.source==='object'?d.source.index:d.source];
-      const t = sim_nodes[typeof d.target==='object'?d.target.index:d.target];
-      if(s&&s.is_target||t&&t.is_target) return 'url(#arr-blue)';
-      if((s&&s.label===1)||(t&&t.label===1)) return 'url(#arr-red)';
-      return 'url(#arr)';
+    .attr('stroke-width',1.8).attr('stroke-opacity',.65)
+    .attr('marker-end',d=>{
+      const s=sn[typeof d.source==='object'?d.source.index:d.source];
+      const t=sn[typeof d.target==='object'?d.target.index:d.target];
+      if(s&&s.is_target||t&&t.is_target) return 'url(#an-b)';
+      if(s&&s.label===1||t&&t.label===1) return 'url(#an-r)';
+      return 'url(#an)';
     });
 
+  // edge relationship labels
+  const edgeLblG = root.append('g');
+  const edgeLbl  = edgeLblG.selectAll('text').data(sl).join('text')
+    .attr('class','edge-lbl').text('SENDS_TO').attr('text-anchor','middle');
+
   // ── Nodes ──
-  const nodeG = root.append('g');
-  const nodeEl = nodeG.selectAll('g').data(sim_nodes).join('g')
+  const nodeG  = root.append('g');
+  const nodeEl = nodeG.selectAll('g').data(sn).join('g')
     .style('cursor','pointer')
     .call(d3.drag()
       .on('start',(e,d)=>{ if(!e.active)sim.alphaTarget(.3).restart(); d.fx=d.x;d.fy=d.y; })
       .on('drag', (e,d)=>{ d.fx=e.x;d.fy=e.y; })
       .on('end',  (e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null;d.fy=null; }))
-    .on('mouseover', showTip)
-    .on('mousemove', moveTip)
-    .on('mouseout',  hideTip)
-    .on('click', (_,d)=>{ quickScore(d.id); });
+    .on('mouseover', showTip).on('mousemove', moveTip).on('mouseout', hideTip)
+    .on('click',(_,d)=>{ showMainNeo4jProps(d); quickScore(d.id); });
 
-  // soft glow halo
+  // target halo
+  nodeEl.filter(d=>d.is_target).append('circle')
+    .attr('r',d=>nRadius(d)+14).attr('fill','#2563eb').attr('fill-opacity',.1).attr('stroke','none');
+  // target dashed ring
+  nodeEl.filter(d=>d.is_target).append('circle')
+    .attr('r',d=>nRadius(d)+8).attr('fill','none')
+    .attr('stroke','#2563eb').attr('stroke-width',1.5)
+    .attr('stroke-dasharray','5 4').attr('stroke-opacity',.55);
+  // main circle
   nodeEl.append('circle')
-    .attr('r', d=>nR(d)+12)
-    .attr('fill', nC)
-    .attr('fill-opacity', .12)
-    .attr('stroke','none');
-
-  // main filled circle
-  nodeEl.append('circle')
-    .attr('r', nR)
-    .attr('fill', nC)
-    .attr('stroke', d=>d.is_target?'#ffffff':d.label===1?'#fca5a5':'#86efac')
-    .attr('stroke-width', d=>d.is_target?4:2)
-    .attr('filter', d=>d.is_target?'url(#gl-blue)':d.label===1?'url(#gl-red)':'url(#gl-green)');
-
-  // fraud probability arc ring
-  nodeEl.filter(d=>d.label===1||d.is_target).append('circle')
-    .attr('r', d=>nR(d)+6)
-    .attr('fill','none')
-    .attr('stroke', d=>d.is_target?'#3b82f6':'#ef4444')
-    .attr('stroke-width', 3)
-    .attr('stroke-dasharray', d=>{ const c=2*Math.PI*(nR(d)+6); return `${c*d.fraud_prob} ${c*(1-d.fraud_prob)}`; })
-    .attr('stroke-linecap','round')
-    .attr('transform','rotate(-90)');
-
-  // type label (TOP line inside circle)
+    .attr('r',nRadius)
+    .attr('fill',d=>neoColor(d).fill)
+    .attr('stroke',d=>neoColor(d).stroke)
+    .attr('stroke-width',2.5)
+    .attr('filter','url(#ns)');
+  // node type label (colon prefix, monospace)
   nodeEl.append('text')
-    .attr('text-anchor','middle').attr('y',-7)
-    .attr('font-family',"'Segoe UI',Arial,sans-serif")
-    .attr('font-size', d=>d.is_target?9:7)
-    .attr('font-weight','700').attr('letter-spacing','.5')
-    .attr('fill','rgba(255,255,255,.8)').attr('pointer-events','none')
-    .text(d=>d.is_target?'TARGET':d.label===1?'ILLICIT':'LICIT');
-
-  // node ID (BOTTOM line inside circle — big bold)
+    .attr('text-anchor','middle').attr('y',d=>d.is_target?-8:-6)
+    .attr('font-family',"'Consolas','Monaco',monospace")
+    .attr('font-size',d=>d.is_target?9:8).attr('font-weight','600').attr('letter-spacing','.5px')
+    .attr('fill','rgba(255,255,255,.72)').attr('pointer-events','none')
+    .text(d=>d.is_target?':Transaction':d.label===1?':Illicit':':Licit');
+  // node ID (large bold)
   nodeEl.append('text')
-    .attr('text-anchor','middle').attr('y',7)
+    .attr('text-anchor','middle').attr('y',d=>d.is_target?11:9)
     .attr('font-family',"'Segoe UI',Arial,sans-serif")
-    .attr('font-size', d=>d.is_target?15:12)
-    .attr('font-weight','800')
+    .attr('font-size',d=>d.is_target?15:12).attr('font-weight','800')
     .attr('fill','#ffffff').attr('pointer-events','none')
     .text(d=>d.id);
-
-  // fraud % below circle
+  // fraud probability badge below node
   nodeEl.filter(d=>d.label===1||d.is_target).append('text')
-    .attr('text-anchor','middle')
-    .attr('dy', d=>nR(d)+22)
+    .attr('text-anchor','middle').attr('dy',d=>nRadius(d)+20)
     .attr('font-size',10).attr('font-weight','700')
-    .attr('fill', d=>d.is_target?'#1d4ed8':'#dc2626')
+    .attr('fill',d=>d.is_target?'#1d4ed8':'#b91c1c')
     .attr('pointer-events','none')
-    .text(d=>(d.fraud_prob*100).toFixed(0)+'%');
+    .text(d=>(d.fraud_prob*100).toFixed(0)+'% fraud');
 
   // ── Tick ──
   sim.on('tick',()=>{
     link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
         .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    edgeLbl.attr('transform',d=>{
+      const sx=(d.source.x||0),sy=(d.source.y||0),tx=(d.target.x||0),ty=(d.target.y||0);
+      let a=Math.atan2(ty-sy,tx-sx)*180/Math.PI;
+      if(a>90||a<-90) a+=180;
+      return `translate(${(sx+tx)/2},${(sy+ty)/2}) rotate(${a})`;
+    });
     nodeEl.attr('transform',d=>`translate(${d.x},${d.y})`);
   });
 
   // zoom to fit
   setTimeout(()=>{
-    const b = root.node().getBBox();
+    const b=root.node().getBBox();
     if(b.width>10){
-      const pad=70, sc2=Math.min((W-pad*2)/b.width,(H-pad*2)/b.height,1.2);
-      const tx=W/2-sc2*(b.x+b.width/2), ty=H/2-sc2*(b.y+b.height/2);
+      const pad=70,sc2=Math.min((W-pad*2)/b.width,(H-pad*2)/b.height,1.2);
+      const tx=W/2-sc2*(b.x+b.width/2),ty=H/2-sc2*(b.y+b.height/2);
       svg.transition().duration(700).ease(d3.easeCubicOut)
         .call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(sc2));
     }
   },1400);
+}
+
+// ── Neo4j properties panel (main graph) ─────────────────────
+function showMainNeo4jProps(d) {
+  const col  = neoColor(d).fill;
+  const type = d.is_target?':Transaction':d.label===1?':Illicit':':Licit';
+  const lbl  = d.label===1?'illicit':d.label===0?'licit':'unknown';
+  document.getElementById('main-props-body').innerHTML =
+    `<div class="neo4j-type-badge" style="background:${col}18;color:${col};border:1px solid ${col}44">${type}</div>` +
+    `<div class="neo4j-prop-row"><span class="neo4j-prop-key">id</span><span class="neo4j-prop-val">${d.id}</span></div>`+
+    `<div class="neo4j-prop-row"><span class="neo4j-prop-key">label</span><span class="neo4j-prop-val" style="color:${col}">${lbl}</span></div>`+
+    `<div class="neo4j-prop-row"><span class="neo4j-prop-key">fraud_prob</span><span class="neo4j-prop-val" style="color:${col}">${(d.fraud_prob*100).toFixed(2)}%</span></div>`+
+    `<div class="neo4j-prop-row"><span class="neo4j-prop-key">is_target</span><span class="neo4j-prop-val">${d.is_target}</span></div>`+
+    `<div class="neo4j-prop-row" style="margin-top:10px"><span style="width:100%"><button onclick="quickScore(${d.id})" style="width:100%;padding:7px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">🔍 Score this node</button></span></div>`;
+  document.getElementById('main-neo4j-props').classList.add('show');
 }
 
 // ── Tooltip ───────────────────────────────────────────────────
@@ -1521,6 +1697,7 @@ async function switchDataset(key) {
   // Always reset graph area to a clean SVG + loading state
   const area = document.getElementById('mg-graph-area');
   area.innerHTML = '<svg id="mg-svg"></svg><div class="mg-tip" id="mg-tip"></div>'
+                 + '<div id="mg-cypher" class="neo4j-cypher-bar"></div>'
                  + '<div class="mg-graph-loading" id="mg-loading" style="display:flex">⟳ Loading graph…</div>';
   showMgLoading(true);
 
@@ -1552,6 +1729,7 @@ async function exploreDsNode() {
   // Rebuild graph area to get fresh SVG
   const area = document.getElementById('mg-graph-area');
   area.innerHTML = '<svg id="mg-svg"></svg><div class="mg-tip" id="mg-tip"></div>'
+                 + '<div id="mg-cypher" class="neo4j-cypher-bar"></div>'
                  + '<div class="mg-graph-loading" id="mg-loading" style="display:flex">⟳ Loading…</div>';
 
   try {
@@ -1609,7 +1787,7 @@ function hideMgNodePanel() {
   if (p) p.className = 'mg-node-panel';
 }
 
-// ── D3 force-directed graph — same rich style as main Elliptic tab ────
+// ── Multi-Dataset Graph (Neo4j style) ─────────────────────────
 function renderMgGraph(nodes, edges, targetNode) {
   if (!nodes || !nodes.length) return;
 
@@ -1617,8 +1795,25 @@ function renderMgGraph(nodes, edges, targetNode) {
   const W = area.clientWidth  || 760;
   const H = area.clientHeight || 460;
 
-  const svg  = d3.select('#mg-svg').attr('width', W).attr('height', H);
-  const mgTip = d3.select('#mg-tip');
+  const svg    = d3.select('#mg-svg').attr('width', W).attr('height', H);
+  const mgTip  = d3.select('#mg-tip');
+  const key    = mgActiveKey || 'elliptic';
+  const nodeTypes = KG_NODE_TYPES[key] || { target:'Node', fraud:'Fraud', legit:'Legit' };
+  const relType   = KG_REL_TYPES[key]  || 'RELATED_TO';
+  const directed  = mgDatasets.find(d => d.key === key)?.directed || false;
+
+  const nRadius = d => d.is_target ? 32 : d.label===1 ? 24 : 20;
+  const nType   = d => ':' + (d.is_target ? nodeTypes.target : d.label===1 ? nodeTypes.fraud : nodeTypes.legit);
+
+  // Update cypher bar
+  const cb = document.getElementById('mg-cypher');
+  if (cb) {
+    cb.style.display = '';
+    cb.innerHTML =
+      `<span class="kw">MATCH</span> <span class="nd">(t:${nodeTypes.target} {id: <span class="num">${targetNode}</span>})</span>`+
+      `-[<span class="rel">r:${relType}${directed?'*1..2':''}]</span>-`+
+      `<span class="nd">(n)</span> <span class="kw">RETURN</span> <span class="prop">t,r,n</span> <span class="kw">LIMIT</span> <span class="num">${nodes.length}</span>`;
+  }
 
   // Zoom layer
   const zoom = d3.zoom().scaleExtent([0.2, 6])
@@ -1626,62 +1821,49 @@ function renderMgGraph(nodes, edges, targetNode) {
   svg.call(zoom);
   const root = svg.append('g');
 
-  // Node colour & radius — identical to main tab
-  const nC = d => d.is_target ? '#3b82f6' : d.label===1 ? '#ef4444' : '#22c55e';
-  const nR = d => d.is_target ? 28 : d.label===1 ? 22 : 20;
-
-  // ── Defs: glows + arrow markers ──
+  // ── Defs ──
   const defs = svg.append('defs');
+  const sf2 = defs.append('filter').attr('id','mns').attr('x','-40%').attr('y','-40%').attr('width','180%').attr('height','180%');
+  sf2.append('feDropShadow').attr('dx',0).attr('dy',3).attr('stdDeviation',5).attr('flood-color','rgba(0,0,0,.16)').attr('result','d');
+  const sm3=sf2.append('feMerge'); sm3.append('feMergeNode').attr('in','d'); sm3.append('feMergeNode').attr('in','SourceGraphic');
 
-  const mkGlow = (id, col, std) => {
-    const f = defs.append('filter').attr('id', id).attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
-    f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation', std).attr('result','blur');
-    const m = f.append('feMerge');
-    m.append('feMergeNode').attr('in','blur');
-    m.append('feMergeNode').attr('in','SourceGraphic');
-  };
-  mkGlow('mg-gl-blue',  '#3b82f6', 6);
-  mkGlow('mg-gl-red',   '#ef4444', 4);
-  mkGlow('mg-gl-green', '#22c55e', 3);
-
-  const mkArrow = (id, col) => {
-    defs.append('marker').attr('id',id).attr('viewBox','0 -4 8 8').attr('refX',8).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto')
-      .append('path').attr('d','M0,-4L8,0L0,4').attr('fill',col);
-  };
-  const directed = mgDatasets.find(d => d.key === mgActiveKey)?.directed || false;
   if (directed) {
-    mkArrow('mg-arr',      '#94a3b8');
-    mkArrow('mg-arr-red',  '#ef4444');
-    mkArrow('mg-arr-blue', '#3b82f6');
+    const mkA2=(id,col)=>defs.append('marker').attr('id',id).attr('viewBox','0 -4 10 8')
+      .attr('refX',10).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto')
+      .append('path').attr('d','M0,-4L10,0L0,4').attr('fill',col);
+    mkA2('mna','#94a3b8'); mkA2('mna-r','#dc2626'); mkA2('mna-b','#2563eb');
   }
 
-  // ── Force simulation ──
+  // ── Force sim ──
   const sim = d3.forceSimulation(nodes)
-    .force('link',   d3.forceLink(edges).id(d => d.id).distance(80).strength(0.45))
-    .force('charge', d3.forceManyBody().strength(-280))
+    .force('link',   d3.forceLink(edges).id(d => d.id).distance(100).strength(.4))
+    .force('charge', d3.forceManyBody().strength(-360))
     .force('center', d3.forceCenter(W/2, H/2))
-    .force('coll',   d3.forceCollide(d => nR(d) + 8));
+    .force('coll',   d3.forceCollide(d => nRadius(d) + 14));
   mgSim = sim;
 
   // ── Edges ──
   const link = root.append('g').selectAll('line').data(edges).join('line')
     .attr('stroke', d => {
-      const sn = nodes.find(n => n.id === (typeof d.source==='object'?d.source.id:d.source));
-      const tn = nodes.find(n => n.id === (typeof d.target==='object'?d.target.id:d.target));
-      if (sn&&sn.is_target||tn&&tn.is_target) return '#3b82f6';
-      if (sn&&sn.label===1||tn&&tn.label===1) return '#ef4444';
-      return '#cbd5e1';
+      const sn = nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source));
+      const tn = nodes.find(n=>n.id===(typeof d.target==='object'?d.target.id:d.target));
+      if (sn&&sn.is_target||tn&&tn.is_target) return '#2563eb';
+      if (sn&&sn.label===1||tn&&tn.label===1) return '#dc2626';
+      return '#94a3b8';
     })
-    .attr('stroke-width', 1.6)
-    .attr('stroke-opacity', 0.65)
+    .attr('stroke-width', 1.6).attr('stroke-opacity', .6)
     .attr('marker-end', d => {
       if (!directed) return null;
-      const sn = nodes.find(n => n.id === (typeof d.source==='object'?d.source.id:d.source));
-      const tn = nodes.find(n => n.id === (typeof d.target==='object'?d.target.id:d.target));
-      if (sn&&sn.is_target||tn&&tn.is_target) return 'url(#mg-arr-blue)';
-      if (sn&&sn.label===1||tn&&tn.label===1) return 'url(#mg-arr-red)';
-      return 'url(#mg-arr)';
+      const sn = nodes.find(n=>n.id===(typeof d.source==='object'?d.source.id:d.source));
+      const tn = nodes.find(n=>n.id===(typeof d.target==='object'?d.target.id:d.target));
+      if (sn&&sn.is_target||tn&&tn.is_target) return 'url(#mna-b)';
+      if (sn&&sn.label===1||tn&&tn.label===1) return 'url(#mna-r)';
+      return 'url(#mna)';
     });
+
+  // edge relationship labels
+  const edgeLbl = root.append('g').selectAll('text').data(edges).join('text')
+    .attr('class','edge-lbl').text(relType).attr('text-anchor','middle');
 
   // ── Node groups ──
   const nodeEl = root.append('g').selectAll('g').data(nodes).join('g')
@@ -1691,80 +1873,72 @@ function renderMgGraph(nodes, edges, targetNode) {
       .on('drag', (e,d)=>{ d.fx=e.x;d.fy=e.y; })
       .on('end',  (e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null;d.fy=null; }))
     .on('mouseover',(e,d)=>{
-      const v = d.is_target?'🔵 TARGET':d.label===1?'🔴 FRAUD':'🟢 LEGIT';
-      const pct = (d.fraud_prob*100).toFixed(1);
-      mgTip.html(`<strong>Node #${d.id}</strong><br>${v}<br>Fraud prob: <strong>${pct}%</strong>`)
+      const pct=(d.fraud_prob*100).toFixed(1);
+      mgTip.html(`<strong>Node #${d.id}</strong><br>${nType(d)}<br>Fraud prob: <strong style="color:${neoColor(d).fill}">${pct}%</strong>`)
         .style('left',(e.offsetX+14)+'px').style('top',(e.offsetY-8)+'px').style('opacity',1);
     })
     .on('mouseout',()=>mgTip.style('opacity',0))
-    .on('click',(e,d)=>{ e.stopPropagation(); document.getElementById('mg-node-input').value=d.id; exploreDsNode(); });
+    .on('click',(e,d)=>{ e.stopPropagation(); onMgNodeClick(d); });
 
-  // soft glow halo
+  // target halo + dashed ring
+  nodeEl.filter(d=>d.is_target).append('circle')
+    .attr('r',d=>nRadius(d)+12).attr('fill','#2563eb').attr('fill-opacity',.1).attr('stroke','none');
+  nodeEl.filter(d=>d.is_target).append('circle')
+    .attr('r',d=>nRadius(d)+8).attr('fill','none')
+    .attr('stroke','#2563eb').attr('stroke-width',1.5)
+    .attr('stroke-dasharray','5 4').attr('stroke-opacity',.55);
+  // main circle
   nodeEl.append('circle')
-    .attr('r', d=>nR(d)+12).attr('fill', nC).attr('fill-opacity',.12).attr('stroke','none');
-
-  // main filled circle
-  nodeEl.append('circle')
-    .attr('r', nR).attr('fill', nC)
-    .attr('stroke', d=>d.is_target?'#ffffff':d.label===1?'#fca5a5':'#86efac')
-    .attr('stroke-width', d=>d.is_target?4:2)
-    .attr('filter', d=>d.is_target?'url(#mg-gl-blue)':d.label===1?'url(#mg-gl-red)':'url(#mg-gl-green)');
-
-  // fraud probability arc ring (target + fraud nodes)
-  nodeEl.filter(d=>d.label===1||d.is_target).append('circle')
-    .attr('r', d=>nR(d)+6).attr('fill','none')
-    .attr('stroke', d=>d.is_target?'#3b82f6':'#ef4444')
-    .attr('stroke-width',3)
-    .attr('stroke-dasharray', d=>{ const c=2*Math.PI*(nR(d)+6); return `${c*d.fraud_prob} ${c*(1-d.fraud_prob)}`; })
-    .attr('stroke-linecap','round').attr('transform','rotate(-90)');
-
-  // type label (top line inside circle)
+    .attr('r',nRadius).attr('fill',d=>neoColor(d).fill)
+    .attr('stroke',d=>neoColor(d).stroke).attr('stroke-width',2.5)
+    .attr('filter','url(#mns)');
+  // node type label
   nodeEl.append('text')
-    .attr('text-anchor','middle').attr('y',-7)
-    .attr('font-family',"'Segoe UI',Arial,sans-serif")
-    .attr('font-size', d=>d.is_target?9:7)
-    .attr('font-weight','700').attr('letter-spacing','.5')
-    .attr('fill','rgba(255,255,255,.85)').attr('pointer-events','none')
-    .text(d=>d.is_target?'TARGET':d.label===1?'FRAUD':'LICIT');
-
-  // node ID (bottom line inside circle)
+    .attr('text-anchor','middle').attr('y',d=>d.is_target?-7:-5)
+    .attr('font-family',"'Consolas','Monaco',monospace")
+    .attr('font-size',d=>d.is_target?9:7.5).attr('font-weight','600').attr('letter-spacing','.5px')
+    .attr('fill','rgba(255,255,255,.72)').attr('pointer-events','none')
+    .text(nType);
+  // node id
   nodeEl.append('text')
-    .attr('text-anchor','middle').attr('y',8)
+    .attr('text-anchor','middle').attr('y',d=>d.is_target?10:8)
     .attr('font-family',"'Segoe UI',Arial,sans-serif")
-    .attr('font-size', d=>d.is_target?15:11)
-    .attr('font-weight','800')
+    .attr('font-size',d=>d.is_target?14:11).attr('font-weight','800')
     .attr('fill','#ffffff').attr('pointer-events','none')
     .text(d=>d.id);
-
-  // fraud % below circle (target + fraud)
+  // fraud % below node
   nodeEl.filter(d=>d.label===1||d.is_target).append('text')
-    .attr('text-anchor','middle')
-    .attr('dy', d=>nR(d)+20)
-    .attr('font-size',10).attr('font-weight','700')
-    .attr('fill', d=>d.is_target?'#1d4ed8':'#dc2626')
+    .attr('text-anchor','middle').attr('dy',d=>nRadius(d)+18)
+    .attr('font-size',9.5).attr('font-weight','700')
+    .attr('fill',d=>d.is_target?'#1d4ed8':'#b91c1c')
     .attr('pointer-events','none')
-    .text(d=>(d.fraud_prob*100).toFixed(0)+'%');
+    .text(d=>(d.fraud_prob*100).toFixed(0)+'% fraud');
 
   // ── Tick ──
   sim.on('tick',()=>{
     link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
         .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    edgeLbl.attr('transform',d=>{
+      const sx=(d.source.x||0),sy=(d.source.y||0),tx=(d.target.x||0),ty=(d.target.y||0);
+      let a=Math.atan2(ty-sy,tx-sx)*180/Math.PI;
+      if(a>90||a<-90) a+=180;
+      return `translate(${(sx+tx)/2},${(sy+ty)/2}) rotate(${a})`;
+    });
     nodeEl.attr('transform',d=>`translate(${d.x},${d.y})`);
   });
 
-  // zoom-to-fit after simulation settles
+  // zoom-to-fit
   setTimeout(()=>{
-    const b = root.node().getBBox();
-    if (b.width > 10) {
-      const pad=60, sc=Math.min((W-pad*2)/b.width,(H-pad*2)/b.height,1.4);
-      const tx=W/2-sc*(b.x+b.width/2), ty=H/2-sc*(b.y+b.height/2);
+    const b=root.node().getBBox();
+    if(b.width>10){
+      const pad=50,sc=Math.min((W-pad*2)/b.width,(H-pad*2)/b.height,1.4);
+      const tx=W/2-sc*(b.x+b.width/2),ty=H/2-sc*(b.y+b.height/2);
       svg.transition().duration(600).ease(d3.easeCubicOut)
-        .call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(sc));
+        .call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(sc));
     }
-  }, 1400);
+  },1400);
 
-  // click SVG background → hide node panel
-  svg.on('click', ()=>hideMgNodePanel());
+  svg.on('click',()=>hideMgNodePanel());
 }
 
 // ── Node click → info panel + update explanation ──────────────
@@ -1975,10 +2149,11 @@ function hideMgExplanation() {
 let legendOpen = true;
 function toggleLegend() {
   legendOpen = !legendOpen;
+  const leg  = document.getElementById('neo4j-legend');
   const btn  = document.getElementById('legend-toggle');
-  const body = document.querySelectorAll('#legend > *:not(:first-child)');
+  const body = leg ? [...leg.children].slice(1) : [];
   body.forEach(el => el.style.display = legendOpen ? '' : 'none');
-  btn.textContent = legendOpen ? 'Hide' : 'Show';
+  if(btn) btn.textContent = legendOpen ? 'Hide' : 'Show';
 }
 
 // ── Zoom ──────────────────────────────────────────────────────
