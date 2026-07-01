@@ -1,6 +1,6 @@
 # GraphShield — Project Explanation
 
-## Ye Project Kya Hai?
+## Ye Project Kya Hai?~~
 
 **GraphShield** ek AI-based system hai jo **financial fraud detect karta hai** — sirf ek dataset mein nahi, balki **5 alag-alag real-world fraud domains** mein — aur har prediction ko **explain bhi karta hai** ki fraud kyun pakda gaya.
 
