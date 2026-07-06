@@ -21,16 +21,17 @@ _MODEL_PRIORITY = [
     ("GCN",        "models/gcn_model.pt",         GCN),
 ]
 
-_HIDDEN    = 64
-_OUT       = 2
-_IN_FEATS  = 166
-_DROPOUT   = 0.4
-_GAT_HEADS = 4
+_HIDDEN     = 64
+_GAT_HIDDEN = 128   # checkpoint trained with 32 per head × 4 heads = 128 total
+_OUT        = 2
+_IN_FEATS   = 166
+_DROPOUT    = 0.4
+_GAT_HEADS  = 4
 
 
 def _build_model(cls, name: str):
     if cls is GAT:
-        return cls(_IN_FEATS, _HIDDEN // _GAT_HEADS, _OUT, heads=_GAT_HEADS, dropout=_DROPOUT)
+        return cls(_IN_FEATS, _GAT_HIDDEN // _GAT_HEADS, _OUT, heads=_GAT_HEADS, dropout=_DROPOUT)
     return cls(_IN_FEATS, _HIDDEN, _OUT, dropout=_DROPOUT)
 
 
