@@ -28,6 +28,8 @@ async def lifespan(app: FastAPI):
     ms = get_model_service()
     ms.load()
     print(f"  Model loaded: {ms.model_name}")
+    print(f"  Dashboard  →  http://localhost:8000")
+    print(f"  API Docs   →  http://localhost:8000/api/docs")
 
     mgs = get_multi_graph_service()
     mgs.load()
