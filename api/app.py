@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pathlib import Path
 
 from api.services.model_service import get_model_service
@@ -62,6 +62,11 @@ app.include_router(explain.router,     prefix="/api/v1")
 app.include_router(health.router,      prefix="/api/v1")
 app.include_router(comparison.router,  prefix="/api/v1")
 app.include_router(multi_graph.router, prefix="/api/v1")
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(status_code=204)
+
 
 # Serve dashboard
 _dashboard = Path("dashboard")
